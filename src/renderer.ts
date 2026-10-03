@@ -6,6 +6,7 @@
 
 import './styles/index.css';
 import { db, seedIfEmpty } from './renderer/db';
+import { mountAiChat } from './renderer/features/ai-chat';
 import { registerCalendar } from './renderer/features/calendar';
 import { registerPlaceholders } from './renderer/features/placeholders';
 import { startRouter } from './renderer/shell/router';
@@ -28,6 +29,7 @@ async function init() {
 
   const settings = await db.settings.get('settings');
   if (settings) setAvatar(settings.apprenticeName);
+  registerWidget('ai', (card) => mountAiChat(card, settings?.apprenticeName)); // #54
 
   const info = await window.canopy.appInfo();
   console.info(`${info.name} v${info.version} on ${info.platform}`);
