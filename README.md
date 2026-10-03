@@ -34,6 +34,8 @@ The app opens with seeded demo data (stored locally in IndexedDB).
 | `npm run lint` / `npm run lint:fix` | Lint + format check (oxlint, oxfmt) |
 | `npm run make` | Build installers into `out/make` (`.deb` + `.zip` on Linux, `.zip` on macOS) |
 
+Focus timer: **⌘⌥⇧F** (macOS) / **Ctrl+Alt+Shift+F** (Linux) starts/pauses from anywhere; the countdown also shows in the tray / menu bar.
+
 Env vars: `CANOPY_DEVTOOLS=1` opens DevTools; `CANOPY_SCREENSHOT=shot.png` saves a screenshot and quits.
 
 CI (`.github/workflows/build.yml`) runs typecheck, lint and `make` on Ubuntu and macOS for every PR and uploads the installers as artifacts.
@@ -43,6 +45,8 @@ CI (`.github/workflows/build.yml`) runs typecheck, lint and `make` on Ubuntu and
 ```
 src/
   main.ts            Electron main process: window, OS features, IPC handlers
+  main/
+    focus-timer.ts   Tray countdown, global shortcut, idle auto-pause (#52)
   preload.ts         Exposes the typed API as window.canopy
   renderer.ts        UI entry point (tabs + widget slots)
   index.css          Design tokens (palette from the design) + layout
@@ -52,6 +56,7 @@ src/
   renderer/
     db.ts            Dexie (IndexedDB) database, seedIfEmpty(), deleteAllData()
     seed.ts          Demo data generated relative to today
+    timer/           Focus timer widget, state, log + reflection dialog (#52)
 assets/icon.png      App icon
 scripts/             Launcher scripts
 ```

@@ -6,7 +6,8 @@
 
 import './index.css';
 import { db, seedIfEmpty } from './renderer/db';
-import { mountCalendar } from './renderer/calendar/calendar';
+import { mountFocusTimer } from './renderer/timer/widget';
+import { OTJ_LOGGED_EVENT } from './renderer/timer/log-dialog';
 
 interface TabView {
   eyebrow: string;
@@ -49,10 +50,6 @@ function showTab(name: string) {
   document.querySelectorAll<HTMLButtonElement>('.tab').forEach((tab) => {
     tab.classList.toggle('is-active', tab.dataset.tab === name);
   });
-  if (name === 'calendar') {
-    mountCalendar(view);
-    return;
-  }
   view.innerHTML = `
     <div class="eyebrow">${v.eyebrow}</div>
     <h1 class="view-title">${v.title}</h1>
@@ -71,10 +68,7 @@ function startOfWeek(): Date {
   return d;
 }
 
-async function init() {
-  await seedIfEmpty();
-  showTab('calendar');
-
+async function renderWeeklyHours() {
   const settings = await db.settings.get('settings');
   const weekMinutes = (
     await db.otjSessions
@@ -85,7 +79,16 @@ async function init() {
   const target = settings?.weeklyOtjTargetHours ?? 0;
   (document.getElementById('hours-stat') as HTMLElement).textContent =
     `${(weekMinutes / 60).toFixed(1)}h / ${target}h this week (from local data)`;
+}
 
+async function init() {
+  showTab('calendar');
+  await seedIfEmpty();
+  mountFocusTimer(document.getElementById('focus-timer') as HTMLElement);
+  await renderWeeklyHours();
+  window.addEventListener(OTJ_LOGGED_EVENT, () => void renderWeeklyHours());
+
+  const settings = await db.settings.get('settings');
   if (settings) {
     (document.getElementById('avatar') as HTMLElement).textContent =
       settings.apprenticeName.slice(0, 2).toUpperCase();
