@@ -119,7 +119,7 @@
   color: var(--text-on-dark);
 }
 
-/* Activity pills: .pill + .pill--journal | meeting | deadline | learning | review */
+/* Activity pills: .pill + .pill--journal | meeting | deadline | learning | review | otj */
 .pill {
   display: block;
   padding: 4px 8px;
@@ -152,6 +152,10 @@
   background: var(--kind-review-bg);
   color: var(--text-on-dark);
 }
+.pill--otj {
+  background: var(--kind-otj-bg);
+  box-shadow: inset 3px 0 0 var(--kind-otj-dot);
+}
 
 /* Legend dot: .dot + .dot--<kind> */
 .dot {
@@ -174,6 +178,10 @@
 }
 .dot--review {
   background: var(--kind-review-dot);
+}
+.dot--otj {
+  background: var(--kind-otj-bg);
+  box-shadow: inset 0 0 0 2px var(--kind-otj-dot);
 }
 
 /* Small rounded label, e.g. "58% complete" */

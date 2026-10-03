@@ -8,11 +8,6 @@ import { registerWidget, type WidgetSlot } from '../shell/widgets';
 const VIEWS: Partial<
   Record<TabName, { eyebrow: string; title: string; issue: string }>
 > = {
-  calendar: {
-    eyebrow: 'Your learning calendar',
-    title: 'Calendar',
-    issue: '#49 Calendar: month and week views',
-  },
   journal: {
     eyebrow: 'Reflections',
     title: 'Journal',
@@ -32,7 +27,6 @@ const VIEWS: Partial<
 
 const WIDGETS: Partial<Record<WidgetSlot, { title: string; issue: string }>> = {
   ai: { title: 'Canopy AI', issue: 'Chat widget · #54' },
-  timer: { title: 'Focus timer', issue: 'Timer & OTJ logging · #52' },
 };
 
 export function registerPlaceholders() {
