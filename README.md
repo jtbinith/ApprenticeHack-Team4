@@ -19,6 +19,8 @@ npm run start:linux  # Linux (adds --no-sandbox)
 
 The app opens with seeded demo data (stored locally in IndexedDB).
 
+**On Windows?** Follow [docs/SETUP-WINDOWS.md](docs/SETUP-WINDOWS.md).
+
 **Linux desktop launcher** (app menu + Desktop icon, runs this checkout):
 
 ```bash
