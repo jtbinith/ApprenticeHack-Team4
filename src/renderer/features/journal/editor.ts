@@ -246,7 +246,8 @@ export function createEntryEditor(
       renderTags();
       changed();
     } else if (target.dataset.action === 'delete' && options.onDelete) {
-      if (confirm('Delete this journal entry?')) await options.onDelete(entry);
+      if (confirm('Delete this entry? This can’t be undone.'))
+        await options.onDelete(entry);
     }
   });
 

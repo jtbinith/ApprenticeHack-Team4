@@ -139,7 +139,15 @@ export async function saveEntry(entry: Entry): Promise<void> {
   });
 }
 
-export async function deleteEntry(entry: Entry): Promise<void> {
+/**
+ * Delete an entry's reflection and files. The calendar item is removed too when
+ * `removeActivity` is set (deleting from the calendar), or when it only existed
+ * for this journal entry.
+ */
+export async function deleteEntry(
+  entry: Entry,
+  { removeActivity = false } = {},
+): Promise<void> {
   await db.transaction(
     'rw',
     db.activities,
@@ -152,10 +160,11 @@ export async function deleteEntry(entry: Entry): Promise<void> {
           e.kind === 'file' ? [e.fileId] : [],
         ),
       );
-      // Only remove the calendar item if it was created for this journal entry.
+      const journalOnly =
+        entry.activity.kind === 'journal' && entry.activity.source === 'manual';
       if (
-        entry.activity.kind === 'journal' &&
-        entry.activity.source === 'manual'
+        entry.activity.source !== REFLECTION_ONLY &&
+        (removeActivity || journalOnly)
       ) {
         await db.activities.delete(entry.activity.id);
       }

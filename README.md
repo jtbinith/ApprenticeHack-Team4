@@ -38,7 +38,11 @@ The app opens with seeded demo data (stored locally in IndexedDB).
 
 Focus timer: **⌘⌥⇧F** (macOS) / **Ctrl+Alt+Shift+F** (Linux) starts/pauses from anywhere; the countdown also shows in the tray / menu bar.
 
-Env vars: `CANOPY_DEVTOOLS=1` opens DevTools; `CANOPY_SCREENSHOT=shot.png` saves a screenshot and quits.
+Env vars:
+- `CANOPY_DEVTOOLS=1` opens DevTools
+- `CANOPY_SCREENSHOT=shot.png` saves a screenshot and quits (`CANOPY_SCREENSHOT_DELAY=5000` to wait longer)
+- `CANOPY_RESET_DATA=1` wipes local data so the demo data is re-seeded
+- `CANOPY_USER_DATA=/tmp/canopy-test` uses a separate profile, so testing doesn't touch your own data
 
 CI (`.github/workflows/build.yml`) runs typecheck, lint and `make` on Ubuntu and macOS for every PR and uploads the installers as artifacts.
 

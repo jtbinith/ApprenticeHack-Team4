@@ -6,6 +6,7 @@
 //   openEntryDialog({ otjSessionId });    // focus timer: session just stopped (#52)
 //   openEntryDialog();                    // "+ Add entry" button
 
+import type { ActivityKind } from '../../../shared/types';
 import { db } from '../../db';
 import { toLocalDateTime } from '../../seed';
 import { openDialog } from '../../ui/dialog';
@@ -26,8 +27,14 @@ export interface OpenEntryOptions {
   date?: string;
   /** Reflect on a just-finished OTJ session; links the session to the new entry. */
   otjSessionId?: string;
+  /** Type for a new entry (default: journal). */
+  kind?: ActivityKind;
   /** Called after the entry is saved. */
   onSaved?: (entry: Entry) => void;
+  /** Called after the entry is saved or deleted (e.g. to re-render a view). */
+  onChange?: () => void;
+  /** Deleting also removes the calendar item (used by the calendar). */
+  deleteRemovesEvent?: boolean;
 }
 
 export async function openEntryDialog(
@@ -35,10 +42,13 @@ export async function openEntryDialog(
 ): Promise<void> {
   let entry: Entry | undefined;
   let isNew = true;
+  let hasReflection = false;
 
   if (options.activityId) {
     entry = await entryForActivity(options.activityId);
-    isNew = !(await db.reflections.get(entry?.reflection.id ?? ''));
+    // An existing calendar item is never "new", even before it has a reflection.
+    isNew = !entry;
+    hasReflection = !!(await db.reflections.get(entry?.reflection.id ?? ''));
   } else if (options.otjSessionId) {
     const session = await db.otjSessions.get(options.otjSessionId);
     if (session) {
@@ -51,7 +61,10 @@ export async function openEntryDialog(
       entry.reflection.ksbs = [...session.ksbs];
     }
   }
-  entry ??= draftEntry({ date: options.date });
+  if (!entry) {
+    entry = draftEntry({ date: options.date });
+    if (options.kind) entry.activity.kind = options.kind;
+  }
 
   const ksbs = await currentKsbs();
   let dialog: { close: () => void } | undefined;
@@ -65,16 +78,24 @@ export async function openEntryDialog(
         });
       }
       options.onSaved?.(saved);
+      options.onChange?.();
       dialog?.close();
     },
     async onDelete(toDelete) {
-      await deleteEntry(toDelete);
+      await deleteEntry(toDelete, {
+        removeActivity: options.deleteRemovesEvent,
+      });
+      options.onChange?.();
       dialog?.close();
     },
   });
 
   dialog = openDialog({
-    title: isNew ? 'New journal entry' : 'Journal entry',
+    title: isNew
+      ? 'New entry'
+      : hasReflection
+        ? 'Journal entry'
+        : 'Calendar entry',
     body: editor.element,
     wide: true,
     onClose: () => editor.destroy(),

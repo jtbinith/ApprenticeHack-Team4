@@ -1,4 +1,11 @@
-import { app, BrowserWindow, ipcMain, Notification, shell } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  Notification,
+  session,
+  shell,
+} from 'electron';
 import { rmSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import os from 'node:os';
@@ -6,6 +13,11 @@ import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import { IPC, type AppInfo } from './shared/ipc';
 import { setupFocusTimer, teardownFocusTimer } from './main/focus-timer';
+
+// CANOPY_USER_DATA=/tmp/canopy-test npm start → use a separate profile (own local data).
+if (process.env.CANOPY_USER_DATA) {
+  app.setPath('userData', process.env.CANOPY_USER_DATA);
+}
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -116,7 +128,11 @@ app.on('will-quit', () => {
   rmSync(openedFilesDir, { recursive: true, force: true });
 });
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  // CANOPY_RESET_DATA=1 npm start → wipe local data so the demo data is re-seeded.
+  if (process.env.CANOPY_RESET_DATA) {
+    await session.defaultSession.clearStorageData({ storages: ['indexdb'] });
+  }
   createWindow();
   setupFocusTimer(() => mainWindow);
 
