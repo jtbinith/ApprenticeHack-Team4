@@ -1,0 +1,274 @@
+/* Reviews tab (#57) */
+
+.reviews-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  background: var(--chartreuse-pale);
+  color: var(--green-900);
+}
+
+.reviews-banner > span {
+  flex: 1;
+}
+
+.reviews {
+  display: grid;
+  grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+  gap: 20px;
+  min-height: 0;
+}
+
+.review-timeline {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+/* Vertical line through the dots */
+.review-timeline::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  bottom: 18px;
+  left: 19px;
+  width: 2px;
+  background: var(--border);
+}
+
+.review-node {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  row-gap: 6px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.review-node:hover {
+  background: var(--surface-alt);
+}
+
+.review-node.is-selected {
+  border-color: var(--border-strong);
+  background: var(--surface-white);
+}
+
+.review-node-dot {
+  grid-row: span 2;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  border: 3px solid var(--green-800);
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.review-node.is-past .review-node-dot {
+  background: var(--green-800);
+}
+
+.review-node-main {
+  display: grid;
+  gap: 2px;
+}
+
+.review-node-title {
+  font-weight: 700;
+}
+
+.review-node-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.review-form-status {
+  justify-self: start;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.review-form-status.is-draft {
+  background: var(--chartreuse-pale);
+  color: var(--green-900);
+}
+
+.review-form-status.is-submitted {
+  background: var(--green-800);
+  color: var(--text-on-dark);
+}
+
+.review-empty {
+  padding: 24px 8px;
+  color: var(--text-muted);
+}
+
+.review-detail {
+  min-width: 0;
+}
+
+.review-detail-inner {
+  display: grid;
+  gap: 20px;
+}
+
+.review-head h2 {
+  margin-top: 2px;
+  font-size: 22px;
+}
+
+.review-head p {
+  margin: 4px 0 0;
+}
+
+.stat-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.stat {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-white);
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--green-900);
+}
+
+.stat-value small {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.review-section {
+  display: grid;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.review-section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.review-section-head h3 {
+  flex: 1;
+  font-size: 16px;
+}
+
+.review-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.review-status .input {
+  width: auto;
+  padding: 5px 8px;
+}
+
+.review-fields {
+  display: grid;
+  gap: 12px;
+}
+
+.review-field-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.review-template summary {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green-800);
+  cursor: pointer;
+}
+
+.template-fields {
+  list-style: none;
+  margin: 10px 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.template-fields li,
+.target {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.template-fields li {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.template-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.target-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-weight: 400;
+}
+
+.target .input {
+  padding: 7px 10px;
+}
+
+/* "9d" on the Reviews tab when a review is close */
+.tab-badge {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--brown);
+  color: var(--text-on-dark);
+  font-size: 10px;
+  font-weight: 800;
+  vertical-align: 1px;
+}

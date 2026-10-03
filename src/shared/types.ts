@@ -128,14 +128,24 @@ export interface Review {
   kind: ReviewKind;
   formTemplateId?: string;
   formStatus: FormStatus;
+  /** Pre-review form answers, keyed by FormTemplate field key. */
+  formAnswers?: Record<string, string>;
   feedback?: string;
   targets: Target[];
 }
 
+/** Where a pre-review form field's auto-fill comes from (#57). */
+export type FormFieldSource =
+  | 'progress'
+  | 'ksbs'
+  | 'otj'
+  | 'targets'
+  | 'evidence';
+
 export interface FormTemplate {
   id: string;
   provider: string;
-  fields: { key: string; label: string; source?: string }[];
+  fields: { key: string; label: string; source?: FormFieldSource }[];
 }
 
 export interface Settings {
