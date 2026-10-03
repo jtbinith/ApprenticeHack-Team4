@@ -1,5 +1,7 @@
-import { app, BrowserWindow, ipcMain, Notification } from 'electron';
+import { app, BrowserWindow, ipcMain, Notification, shell } from 'electron';
+import { rmSync } from 'node:fs';
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import { IPC, type AppInfo } from './shared/ipc';
@@ -30,6 +32,28 @@ const createWindow = () => {
     );
   }
 
+  // Open web links (e.g. evidence links) in the user's browser, never inside the app.
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (/^https?:\/\//.test(url)) shell.openExternal(url);
+    return { action: 'deny' };
+  });
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    // Only allow reloading the app itself (e.g. dev hot reload), never other pages or dropped files.
+    try {
+      const appUrl = new URL(mainWindow.webContents.getURL());
+      const target = new URL(url);
+      if (
+        target.origin === appUrl.origin &&
+        target.pathname === appUrl.pathname
+      )
+        return;
+    } catch {
+      // Unparseable URL: fall through and block it.
+    }
+    event.preventDefault();
+    if (/^https?:\/\//.test(url)) shell.openExternal(url);
+  });
+
   if (process.env.CANOPY_DEVTOOLS) {
     mainWindow.webContents.openDevTools();
   }
@@ -38,11 +62,14 @@ const createWindow = () => {
   const screenshotPath = process.env.CANOPY_SCREENSHOT;
   if (screenshotPath) {
     mainWindow.webContents.once('did-finish-load', () => {
-      setTimeout(async () => {
-        const image = await mainWindow.webContents.capturePage();
-        await fs.writeFile(screenshotPath, image.toPNG());
-        app.quit();
-      }, 2000);
+      setTimeout(
+        async () => {
+          const image = await mainWindow.webContents.capturePage();
+          await fs.writeFile(screenshotPath, image.toPNG());
+          app.quit();
+        },
+        Number(process.env.CANOPY_SCREENSHOT_DELAY ?? 2000),
+      );
     });
   }
 };
@@ -58,6 +85,26 @@ ipcMain.handle(
 
 ipcMain.handle(IPC.notify, (_event, title: string, body: string) => {
   if (Notification.isSupported()) new Notification({ title, body }).show();
+});
+
+// Evidence files live in IndexedDB; to open one we write a temporary copy and
+// hand it to the OS. Copies are removed when the app quits.
+const openedFilesDir = path.join(os.tmpdir(), `canopy-files-${process.pid}`);
+
+ipcMain.handle(
+  IPC.openFile,
+  async (_event, name: string, data: ArrayBuffer) => {
+    const safeName = path.basename(name).replace(/[^\w.\- ()]/g, '_') || 'file';
+    await fs.mkdir(openedFilesDir, { recursive: true });
+    const filePath = path.join(openedFilesDir, `${Date.now()}-${safeName}`);
+    await fs.writeFile(filePath, Buffer.from(data));
+    const error = await shell.openPath(filePath);
+    if (error) throw new Error(error);
+  },
+);
+
+app.on('will-quit', () => {
+  rmSync(openedFilesDir, { recursive: true, force: true });
 });
 
 app.whenReady().then(() => {

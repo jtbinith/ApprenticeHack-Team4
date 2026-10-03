@@ -54,11 +54,35 @@ export interface Reflection {
   action: string;
   result: string;
   ksbs: string[];
-  evidence: string[];
+  evidence: Evidence[];
+  /** Free-form block notes (Editor.js output). */
+  notes?: NotesData;
   /** KSB tags confirmed by the apprentice (vs only suggested). */
   confirmed: boolean;
   portalStatus: PortalStatus;
   assessorComment?: string;
+}
+
+/** A link, or a file stored locally in the `files` table. */
+export type Evidence =
+  | { kind: 'link'; url: string }
+  | { kind: 'file'; fileId: string; name: string; type: string; size: number };
+
+/** An evidence file (PDF, image, document…) stored on the device. */
+export interface StoredFile {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  blob: Blob;
+  addedAt: string;
+}
+
+/** Editor.js document, kept generic so shared code doesn't depend on Editor.js. */
+export interface NotesData {
+  time?: number;
+  version?: string;
+  blocks: { id?: string; type: string; data: unknown }[];
 }
 
 export const OTJ_CATEGORIES = [

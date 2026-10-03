@@ -5,19 +5,13 @@
 import { registerView, type TabName } from '../shell/router';
 import { registerWidget, type WidgetSlot } from '../shell/widgets';
 
-const VIEWS: Record<
-  TabName,
-  { eyebrow: string; title: string; issue: string }
+const VIEWS: Partial<
+  Record<TabName, { eyebrow: string; title: string; issue: string }>
 > = {
   calendar: {
     eyebrow: 'Your learning calendar',
     title: 'Calendar',
     issue: '#49 Calendar: month and week views',
-  },
-  journal: {
-    eyebrow: 'Reflections',
-    title: 'Journal',
-    issue: '#50 Journal: STAR entries, KSB tagging, evidence',
   },
   hours: {
     eyebrow: 'Off-the-job',
@@ -45,7 +39,7 @@ const WIDGETS: Record<WidgetSlot, { title: string; issue: string }> = {
 export function registerPlaceholders() {
   for (const [tab, v] of Object.entries(VIEWS) as [
     TabName,
-    (typeof VIEWS)[TabName],
+    NonNullable<(typeof VIEWS)[TabName]>,
   ][]) {
     registerView(tab, {
       eyebrow: v.eyebrow,

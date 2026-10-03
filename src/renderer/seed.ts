@@ -141,7 +141,7 @@ export function seed(): SeedData {
       result:
         'Both CRs were approved in a day. I learned to keep CRs under 300 lines so reviews are faster.',
       ksbs: ['S11', 'S5'],
-      evidence: ['https://example.invalid/cr/123'],
+      evidence: [{ kind: 'link', url: 'https://example.invalid/cr/123' }],
       confirmed: true,
       portalStatus: 'accepted',
     },

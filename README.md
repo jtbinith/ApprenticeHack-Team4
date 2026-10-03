@@ -115,6 +115,19 @@ openDialog({
 });
 ```
 
+**Open the journal entry form** (from the calendar, timer, etc.):
+
+```ts
+import { openEntryDialog } from '../journal';
+
+openEntryDialog({ activityId });          // clicked a calendar event
+openEntryDialog({ date: '2026-10-07' });  // clicked an empty day
+openEntryDialog({ otjSessionId });        // focus timer just stopped
+openEntryDialog();                        // "+ Add entry"
+```
+
+Saving creates or updates the calendar activity and its STAR reflection, so the calendar and Journal tab stay in sync. Use Dexie's `liveQuery` to re-render when data changes.
+
 ## UI kit
 
 Classes in `src/styles/components.css`:

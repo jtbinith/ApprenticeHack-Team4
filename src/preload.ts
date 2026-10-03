@@ -7,6 +7,7 @@ import { IPC, type CanopyApi } from './shared/ipc';
 const api: CanopyApi = {
   appInfo: () => ipcRenderer.invoke(IPC.appInfo),
   notify: (title, body) => ipcRenderer.invoke(IPC.notify, title, body),
+  openFile: (name, data) => ipcRenderer.invoke(IPC.openFile, name, data),
 };
 
 contextBridge.exposeInMainWorld('canopy', api);
