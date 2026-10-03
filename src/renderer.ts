@@ -13,6 +13,7 @@ import { registerHours } from './renderer/features/hours';
 import { registerJournal } from './renderer/features/journal';
 import { registerReviews } from './renderer/features/reviews';
 import { registerPlaceholders } from './renderer/features/placeholders';
+import { registerSetup } from './renderer/features/setup';
 import { startRouter } from './renderer/shell/router';
 import { renderTopbar, setAvatar } from './renderer/shell/topbar';
 import { registerWidget } from './renderer/shell/widgets';
@@ -31,6 +32,7 @@ async function init() {
   registerJournal(); // #50
   registerHints(); // #51
   registerReviews(); // #57
+  registerSetup(); // #55
   registerWidget('timer', (card) => {
     card.classList.add('widget-timer'); // hook for src/renderer/timer/timer.css
     mountFocusTimer(card);

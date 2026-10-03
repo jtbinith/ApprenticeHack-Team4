@@ -9,12 +9,18 @@ export interface Ksb {
   type: KsbType;
   title: string;
   keywords: string[];
+  /** Full wording from the official standard, when bundled from IfATE. */
+  detail?: string;
 }
 
 export interface Standard {
   id: string;
   name: string;
   ksbs: Ksb[];
+  /** IfATE reference and version, e.g. "ST0116 v1.2". */
+  reference?: string;
+  /** Where the KSB wording came from. */
+  sourceUrl?: string;
 }
 
 /** Anything on the calendar. */
@@ -132,6 +138,8 @@ export interface Review {
   formAnswers?: Record<string, string>;
   feedback?: string;
   targets: Target[];
+  /** The calendar activity that shows this review. */
+  activityId?: string;
 }
 
 /** Where a pre-review form field's auto-fill comes from (#57). */
@@ -156,4 +164,6 @@ export interface Settings {
   apprenticeshipEnd?: string;
   /** Weekly OTJ target in hours, taken from the apprentice's training plan. */
   weeklyOtjTargetHours: number;
+  /** When the setup wizard was last finished (ISO). */
+  setupCompletedAt?: string;
 }
