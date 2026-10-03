@@ -6,6 +6,7 @@
 
 import './styles/index.css';
 import { db, removeOrphanFiles, seedIfEmpty } from './renderer/db';
+import { mountAiChat } from './renderer/features/ai-chat';
 import { registerCalendar } from './renderer/features/calendar';
 import { registerHints } from './renderer/features/hints';
 import { registerHours } from './renderer/features/hours';
@@ -42,6 +43,7 @@ async function init() {
 
   const settings = await db.settings.get('settings');
   if (settings) setAvatar(settings.apprenticeName);
+  registerWidget('ai', (card) => mountAiChat(card, settings?.apprenticeName)); // #54
 
   const info = await window.canopy.appInfo();
   console.info(`${info.name} v${info.version} on ${info.platform}`);
