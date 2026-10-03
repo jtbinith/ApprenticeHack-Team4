@@ -1,0 +1,54 @@
+/* Design tokens — sampled from "Canopy Concept 2 screenshot.png".
+   Use these variables in feature CSS instead of raw hex values. */
+:root {
+  /* Surfaces */
+  --page: #f2f3e7;
+  --surface: #fafbf4;
+  --surface-alt: #f0f2df; /* weekday header row, tab track */
+  --surface-white: #ffffff;
+  --border: #e1e3d3;
+  --border-strong: #cfd3b8;
+
+  /* Text */
+  --text: #2a2a20;
+  --text-muted: #8a8a78;
+  --text-on-dark: #ffffff;
+  --text-on-dark-muted: #cbd8ac;
+
+  /* Greens */
+  --green-900: #355d0b; /* AI card */
+  --green-800: #436e0e; /* primary buttons, logo */
+  --green-700: #557f13; /* today circle */
+  --green-600: #6c931e; /* progress bar, send button */
+  --green-500: #708e2a; /* eyebrow text */
+  --chartreuse: #d4df96; /* meeting / review pills */
+  --chartreuse-pale: #edf3c2; /* journal pills, today cell */
+  --sage: #e4e8c8; /* learning pills */
+  --lime-card: #e5ebbc; /* focus timer card */
+  --lime-border: #cfdba0;
+
+  /* Browns */
+  --brown: #62442f; /* deadlines, start button, avatar */
+  --brown-hover: #523826;
+
+  /* Activity kinds (calendar pills + legend dots) */
+  --kind-journal-bg: var(--chartreuse-pale);
+  --kind-journal-dot: #b2c944;
+  --kind-meeting-bg: var(--chartreuse);
+  --kind-meeting-dot: #789d24;
+  --kind-deadline-bg: var(--brown);
+  --kind-deadline-dot: var(--brown);
+  --kind-learning-bg: var(--sage);
+  --kind-learning-dot: #899d4f;
+  --kind-review-bg: var(--green-800);
+  --kind-review-dot: var(--green-800);
+
+  /* Shape & type */
+  --radius-lg: 20px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 2px rgb(42 42 32 / 0.06);
+  --font:
+    'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+}

@@ -1,0 +1,5 @@
+/* Canopy styles. Features add their own CSS file next to their code and import it there. */
+@import './tokens.css';
+@import './base.css';
+@import './components.css';
+@import './shell.css';
