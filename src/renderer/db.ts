@@ -69,6 +69,7 @@ export async function seedIfEmpty(): Promise<void> {
     await db.reflections.bulkPut(data.reflections);
     await db.otjSessions.bulkPut(data.otjSessions);
     await db.reviews.bulkPut(data.reviews);
+    await db.files.bulkPut(data.files);
   });
 }
 
