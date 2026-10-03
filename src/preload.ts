@@ -7,6 +7,7 @@ import { IPC, type CanopyApi, type TimerCommand } from './shared/ipc';
 const api: CanopyApi = {
   appInfo: () => ipcRenderer.invoke(IPC.appInfo),
   notify: (title, body) => ipcRenderer.invoke(IPC.notify, title, body),
+  openFile: (name, data) => ipcRenderer.invoke(IPC.openFile, name, data),
   timerState: (snapshot) => ipcRenderer.send(IPC.timerState, snapshot),
   onTimerCommand: (listener) => {
     const handler = (_event: IpcRendererEvent, command: TimerCommand) =>

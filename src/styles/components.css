@@ -250,6 +250,10 @@ textarea.input {
   box-shadow: 0 20px 50px rgb(42 42 32 / 0.18);
 }
 
+.dialog--wide {
+  width: min(720px, 92vw);
+}
+
 .dialog::backdrop {
   background: rgb(42 42 32 / 0.35);
 }

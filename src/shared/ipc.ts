@@ -7,6 +7,7 @@
 export const IPC = {
   appInfo: 'app:info',
   notify: 'app:notify',
+  openFile: 'file:open',
   timerState: 'timer:state',
   timerCommand: 'timer:command',
 } as const;
@@ -40,6 +41,8 @@ export interface CanopyApi {
   appInfo(): Promise<AppInfo>;
   /** Native OS notification (e.g. focus timer finished, review due). */
   notify(title: string, body: string): Promise<void>;
+  /** Open a locally stored file (e.g. a PDF evidence) in the system's default app. */
+  openFile(name: string, data: ArrayBuffer): Promise<void>;
   /** Push the focus timer state to main (tray countdown, idle detection). */
   timerState(snapshot: TimerSnapshot): void;
   /** Subscribe to timer commands from main. Returns an unsubscribe function. */

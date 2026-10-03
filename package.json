@@ -36,6 +36,9 @@
     "vite": "^8.3.2"
   },
   "dependencies": {
+    "@editorjs/editorjs": "^2.31.7",
+    "@editorjs/header": "^2.8.9",
+    "@editorjs/list": "^2.0.9",
     "dexie": "^4.4.6",
     "electron-squirrel-startup": "^1.0.1"
   }
