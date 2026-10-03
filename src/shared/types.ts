@@ -23,7 +23,8 @@ export type ActivityKind =
   | 'meeting'
   | 'deadline'
   | 'learning'
-  | 'review';
+  | 'review'
+  | 'otj';
 
 export interface Activity {
   id: string;

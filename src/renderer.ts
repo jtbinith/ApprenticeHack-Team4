@@ -6,17 +6,22 @@
 
 import './styles/index.css';
 import { db, seedIfEmpty } from './renderer/db';
+import { registerCalendar } from './renderer/features/calendar';
 import { registerPlaceholders } from './renderer/features/placeholders';
 import { startRouter } from './renderer/shell/router';
 import { renderTopbar, setAvatar } from './renderer/shell/topbar';
+import { registerWidget } from './renderer/shell/widgets';
 import { byId } from './renderer/ui/dom';
+import { mountFocusTimer } from './renderer/timer/widget';
 
 async function init() {
   renderTopbar(byId('topbar'));
   registerPlaceholders();
-  // Feature modules go here, e.g.:
-  // registerCalendar();   // #49
-  // registerFocusTimer(); // #52
+  registerCalendar(); // #49
+  registerWidget('timer', (card) => {
+    card.classList.add('widget-timer'); // hook for src/renderer/timer/timer.css
+    mountFocusTimer(card);
+  }); // #52
 
   await seedIfEmpty();
   startRouter(byId('view'));
