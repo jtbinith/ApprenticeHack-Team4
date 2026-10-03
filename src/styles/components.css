@@ -1,0 +1,297 @@
+/* Shared UI pieces. See README "UI kit" for usage. */
+
+/* Card */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+}
+
+/* Eyebrow + titles */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--green-500);
+}
+
+.view-title {
+  margin-top: 4px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* Buttons: .btn + .btn-primary | .btn-secondary | .btn-brown | .btn-ghost, optional .btn-icon */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--green-800);
+  color: var(--text-on-dark);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--green-900);
+}
+
+.btn-secondary {
+  background: var(--surface-white);
+  border-color: var(--border-strong);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--surface-alt);
+}
+
+.btn-brown {
+  background: var(--brown);
+  color: var(--text-on-dark);
+}
+
+.btn-brown:hover:not(:disabled) {
+  background: var(--brown-hover);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--surface-alt);
+}
+
+.btn-icon {
+  width: 36px;
+  padding: 0;
+}
+
+/* Joined buttons, e.g. prev / next */
+.btn-group {
+  display: inline-flex;
+}
+
+.btn-group > .btn {
+  border-radius: 0;
+}
+
+.btn-group > .btn:first-child {
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+.btn-group > .btn:last-child {
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.btn-group > .btn + .btn {
+  border-left: 0;
+}
+
+/* Segmented choice, e.g. 15 / 25 / 45 min presets */
+.chip {
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chip.is-active {
+  background: var(--green-800);
+  border-color: var(--green-800);
+  color: var(--text-on-dark);
+}
+
+/* Activity pills: .pill + .pill--journal | meeting | deadline | learning | review | otj */
+.pill {
+  display: block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
+.pill--journal {
+  background: var(--kind-journal-bg);
+}
+.pill--meeting {
+  background: var(--kind-meeting-bg);
+}
+.pill--deadline {
+  background: var(--kind-deadline-bg);
+  color: var(--text-on-dark);
+}
+.pill--learning {
+  background: var(--kind-learning-bg);
+}
+.pill--review {
+  background: var(--kind-review-bg);
+  color: var(--text-on-dark);
+}
+.pill--otj {
+  background: var(--kind-otj-bg);
+  box-shadow: inset 3px 0 0 var(--kind-otj-dot);
+}
+
+/* Legend dot: .dot + .dot--<kind> */
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.dot--journal {
+  background: var(--kind-journal-dot);
+}
+.dot--meeting {
+  background: var(--kind-meeting-dot);
+}
+.dot--deadline {
+  background: var(--kind-deadline-dot);
+}
+.dot--learning {
+  background: var(--kind-learning-dot);
+}
+.dot--review {
+  background: var(--kind-review-dot);
+}
+.dot--otj {
+  background: var(--kind-otj-bg);
+  box-shadow: inset 0 0 0 2px var(--kind-otj-dot);
+}
+
+/* Small rounded label, e.g. "58% complete" */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--lime-card);
+  color: var(--green-900);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Progress bar: <div class="progress"><div class="progress-bar" style="width: 58%"></div></div> */
+.progress {
+  height: 6px;
+  border-radius: 999px;
+  background: #e3e5d5;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green-600);
+}
+
+/* Form fields: <label class="field"><span>Title</span><input class="input"></label> */
+.field {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-white);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text);
+}
+
+textarea.input {
+  resize: vertical;
+  min-height: 72px;
+}
+
+.input:focus {
+  outline: 2px solid var(--green-600);
+  outline-offset: -1px;
+}
+
+/* Dialog (see src/renderer/ui/dialog.ts) */
+.dialog {
+  width: min(560px, 90vw);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 20px 50px rgb(42 42 32 / 0.18);
+}
+
+.dialog::backdrop {
+  background: rgb(42 42 32 / 0.35);
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 16px 0 24px;
+}
+
+.dialog-title {
+  font-size: 18px;
+}
+
+.dialog-body {
+  display: grid;
+  gap: 14px;
+  padding: 16px 24px;
+  max-height: 65vh;
+  overflow: auto;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0 24px 20px;
+}
+
+.dialog-actions:empty {
+  display: none;
+}
+
+/* Placeholder for features not built yet */
+.placeholder {
+  display: grid;
+  place-items: center;
+  min-height: 360px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  text-align: center;
+  padding: 24px;
+}

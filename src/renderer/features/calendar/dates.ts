@@ -2,7 +2,7 @@
 // Activity times are local `YYYY-MM-DDTHH:mm` strings (see shared/types.ts),
 // which `new Date()` parses as local time.
 
-import { pad } from '../seed';
+import { pad } from '../../seed';
 
 export const DAY_MS = 86_400_000;
 

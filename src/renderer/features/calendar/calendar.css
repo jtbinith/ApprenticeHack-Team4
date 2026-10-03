@@ -1,45 +1,13 @@
-/* Calendar tab (#49). Uses tokens from src/index.css. */
+/* Calendar tab (#49). Buttons, pills, dots, fields and dialogs come from
+   src/styles/components.css; colours from src/styles/tokens.css. */
 
-/* Fill the main panel edge to edge, like the design. */
+/* Fill the main panel edge to edge (cancels the .card padding), like the design. */
 .cal {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  height: calc(100% + 40px);
   min-height: 560px;
   margin: -20px -24px;
-}
-
-/* Kind colours — shared by pills, week blocks and legend dots. */
-.cal-kind-journal {
-  --kind-bg: var(--chartreuse-pale);
-  --kind-fg: var(--text);
-  --kind-dot: #c3d16c;
-}
-.cal-kind-meeting {
-  --kind-bg: var(--chartreuse);
-  --kind-fg: var(--text);
-  --kind-dot: var(--green-600);
-}
-.cal-kind-deadline {
-  --kind-bg: var(--brown);
-  --kind-fg: #fff;
-  --kind-dot: var(--brown);
-}
-.cal-kind-learning {
-  --kind-bg: var(--sage);
-  --kind-fg: var(--text);
-  --kind-dot: #9fae6a;
-}
-.cal-kind-review {
-  --kind-bg: var(--green-800);
-  --kind-fg: #fff;
-  --kind-dot: var(--green-800);
-}
-.cal-kind-otj {
-  --kind-bg: var(--timer);
-  --kind-fg: var(--green-900);
-  --kind-dot: var(--green-900);
-  box-shadow: inset 3px 0 0 var(--green-600);
 }
 
 /* Header */
@@ -52,65 +20,10 @@
   padding: 20px 24px 16px;
 }
 
-.cal-title {
-  margin: 4px 0 0;
-  font-size: 28px;
-}
-
 .cal-controls {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.cal-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: #fff;
-  color: var(--text);
-  font-weight: 600;
-}
-
-.cal-btn:hover {
-  background: var(--surface-alt);
-}
-
-.cal-btn-primary {
-  border-color: var(--green-800);
-  background: var(--green-800);
-  color: #fff;
-}
-
-.cal-btn-primary:hover {
-  background: var(--green-900);
-}
-
-.cal-btn-danger {
-  color: var(--brown);
-}
-
-.cal-nav {
-  display: flex;
-}
-
-.cal-icon-btn {
-  justify-content: center;
-  width: 36px;
-  padding: 0;
-}
-
-.cal-nav .cal-icon-btn:first-child {
-  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-}
-
-.cal-nav .cal-icon-btn:last-child {
-  margin-left: -1px;
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
 .cal-toggle {
@@ -124,17 +37,18 @@
 .cal-toggle button {
   border: 0;
   padding: 5px 12px;
-  border-radius: 7px;
+  border-radius: 6px;
   background: transparent;
   color: var(--text-muted);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .cal-toggle button[aria-pressed='true'] {
-  background: #fff;
+  background: var(--surface-white);
   color: var(--text);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+  box-shadow: var(--shadow);
 }
 
 .cal-body {
@@ -204,7 +118,7 @@
 }
 
 .cal-cell.is-outside .cal-daynum {
-  color: #bdbdaa;
+  color: var(--border-strong);
 }
 
 .cal-cell.is-outside .cal-pills {
@@ -229,8 +143,8 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: var(--green-800);
-  color: #fff;
+  background: var(--green-700);
+  color: var(--text-on-dark);
 }
 
 .cal-today-label {
@@ -248,27 +162,11 @@
   min-width: 0;
 }
 
-.cal-pill {
-  display: block;
-  width: 100%;
-  padding: 4px 8px;
-  border: 0;
-  border-radius: 5px;
-  background: var(--kind-bg);
-  color: var(--kind-fg);
-  font-size: 11px;
-  font-weight: 600;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-span.cal-pill {
+span.pill {
   cursor: default;
 }
 
-button.cal-pill:hover {
+button.pill:hover {
   filter: brightness(0.95);
 }
 
@@ -280,6 +178,7 @@ button.cal-pill:hover {
   color: var(--green-800);
   font-size: 11px;
   font-weight: 700;
+  cursor: pointer;
 }
 
 .cal-more:hover {
@@ -324,8 +223,8 @@ button.cal-pill:hover {
 .cal-week-dayhead.is-today .cal-week-date {
   width: 30px;
   border-radius: 50%;
-  background: var(--green-800);
-  color: #fff;
+  background: var(--green-700);
+  color: var(--text-on-dark);
   font-size: 15px;
 }
 
@@ -381,10 +280,11 @@ button.cal-pill:hover {
   border: 0;
   border-radius: 6px;
   background: var(--kind-bg);
-  color: var(--kind-fg);
+  color: var(--kind-fg, var(--text));
   font-size: 11px;
   text-align: left;
   overflow: hidden;
+  cursor: pointer;
 }
 
 div.cal-block {
@@ -415,6 +315,29 @@ button.cal-block:hover {
 
 .cal-block-time {
   opacity: 0.8;
+}
+
+.cal-kind-journal {
+  --kind-bg: var(--kind-journal-bg);
+}
+.cal-kind-meeting {
+  --kind-bg: var(--kind-meeting-bg);
+}
+.cal-kind-deadline {
+  --kind-bg: var(--kind-deadline-bg);
+  --kind-fg: var(--text-on-dark);
+}
+.cal-kind-learning {
+  --kind-bg: var(--kind-learning-bg);
+}
+.cal-kind-review {
+  --kind-bg: var(--kind-review-bg);
+  --kind-fg: var(--text-on-dark);
+}
+.cal-kind-otj {
+  --kind-bg: var(--kind-otj-bg);
+  --kind-fg: var(--green-900);
+  box-shadow: inset 3px 0 0 var(--kind-otj-dot);
 }
 
 .cal-now {
@@ -455,70 +378,10 @@ button.cal-block:hover {
   gap: 6px;
 }
 
-.cal-dot {
-  flex: none;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--kind-dot);
-  box-shadow: none;
-}
-
-.cal-dot.cal-kind-otj {
-  background: var(--timer);
-  box-shadow: inset 0 0 0 2px var(--green-600);
-}
-
 /* Dialogs */
-.cal-dialog {
-  width: min(440px, calc(100vw - 32px));
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: 0 20px 50px rgb(0 0 0 / 0.18);
-}
-
-.cal-dialog::backdrop {
-  background: rgb(42 42 32 / 0.35);
-}
-
 .cal-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 22px 24px;
-}
-
-.cal-form h2 {
-  margin: 0 0 4px;
-  font-size: 20px;
-}
-
-.cal-form label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #5b5b4a;
-}
-
-.cal-form :is(input, select) {
-  height: 36px;
-  padding: 0 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: #fff;
-  color: var(--text);
-  font: inherit;
-  font-size: 14px;
-}
-
-.cal-form :is(input, select):focus {
-  outline: 2px solid var(--green-600);
-  outline-offset: -1px;
+  display: grid;
+  gap: 14px;
 }
 
 .cal-form-row {
@@ -533,16 +396,6 @@ button.cal-block:hover {
   color: var(--brown);
 }
 
-.cal-form-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.cal-form-actions .spacer {
-  flex: 1;
-}
-
 .cal-day-list {
   display: flex;
   flex-direction: column;
@@ -550,7 +403,6 @@ button.cal-block:hover {
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 14px;
 }
 
 .cal-day-list li {
@@ -569,9 +421,9 @@ button.cal-block:hover {
   border: 0;
   padding: 0;
   background: none;
-  color: var(--text);
   font-weight: 600;
   text-align: left;
+  cursor: pointer;
 }
 
 .cal-link:hover {

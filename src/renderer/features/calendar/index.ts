@@ -2,8 +2,13 @@
 // Shows calendar activities plus logged OTJ sessions from the focus timer.
 
 import './calendar.css';
-import { db } from '../db';
-import type { Activity, ActivityKind } from '../../shared/types';
+import { db } from '../../db';
+import { toLocalDateTime } from '../../seed';
+import { registerView } from '../../shell/router';
+import { openDialog } from '../../ui/dialog';
+import { escapeHtml } from '../../ui/dom';
+import { icon } from '../../ui/icons';
+import type { Activity, ActivityKind } from '../../../shared/types';
 import {
   DAY_MS,
   WEEKDAYS,
@@ -20,8 +25,7 @@ import {
   timeOf,
 } from './dates';
 import { openEntryDialog } from './entry-dialog';
-import { KINDS, escapeHtml } from './kinds';
-import { toLocalDateTime } from '../seed';
+import { KINDS } from './kinds';
 
 /** Fired by the focus timer (#52) after an OTJ session is logged. */
 const OTJ_LOGGED_EVENT = 'canopy:otj-logged';
@@ -54,17 +58,25 @@ const state: { mode: ViewMode; anchor: Date } = {
 let root: HTMLElement | null = null;
 let currentEvents: CalEvent[] = [];
 let renderToken = 0;
-let listening = false;
 
-export function mountCalendar(container: HTMLElement): void {
-  container.innerHTML = '<div class="cal"></div>';
-  root = container.querySelector('.cal') as HTMLElement;
-  root.addEventListener('click', onClick);
-  if (!listening) {
-    listening = true;
-    window.addEventListener(OTJ_LOGGED_EVENT, () => void render());
-  }
-  void render();
+export function registerCalendar() {
+  registerView('calendar', {
+    eyebrow: 'Your learning calendar',
+    title: 'Calendar',
+    customHeader: true,
+    mount(container) {
+      container.innerHTML = '<div class="cal"></div>';
+      root = container.querySelector('.cal') as HTMLElement;
+      root.addEventListener('click', onClick);
+      const refresh = () => void render();
+      window.addEventListener(OTJ_LOGGED_EVENT, refresh);
+      void render();
+      return () => {
+        window.removeEventListener(OTJ_LOGGED_EVENT, refresh);
+        root = null;
+      };
+    },
+  });
 }
 
 function visibleRange(): { from: Date; to: Date; days: Date[] } {
@@ -136,21 +148,19 @@ async function render(): Promise<void> {
     <header class="cal-head">
       <div>
         <div class="eyebrow">Your learning calendar</div>
-        <h1 class="cal-title">${title}</h1>
+        <h1 class="view-title">${title}</h1>
       </div>
       <div class="cal-controls">
         <div class="cal-toggle" role="group" aria-label="Calendar view">
           <button type="button" data-mode="month" aria-pressed="${state.mode === 'month'}">Month</button>
           <button type="button" data-mode="week" aria-pressed="${state.mode === 'week'}">Week</button>
         </div>
-        <button type="button" class="cal-btn" data-nav="today">Today</button>
-        <div class="cal-nav">
-          <button type="button" class="cal-btn cal-icon-btn" data-nav="prev" aria-label="Previous ${state.mode}">${chevron('left')}</button>
-          <button type="button" class="cal-btn cal-icon-btn" data-nav="next" aria-label="Next ${state.mode}">${chevron('right')}</button>
+        <button type="button" class="btn btn-secondary" data-nav="today">Today</button>
+        <div class="btn-group">
+          <button type="button" class="btn btn-secondary btn-icon" data-nav="prev" aria-label="Previous ${state.mode}">${icon('chevron-left')}</button>
+          <button type="button" class="btn btn-secondary btn-icon" data-nav="next" aria-label="Next ${state.mode}">${icon('chevron-right')}</button>
         </div>
-        <button type="button" class="cal-btn cal-btn-primary" data-action="add">
-          <span aria-hidden="true">+</span> Add entry
-        </button>
+        <button type="button" class="btn btn-primary" data-action="add">${icon('plus')}Add entry</button>
       </div>
     </header>
     <div class="cal-body">
@@ -159,7 +169,7 @@ async function render(): Promise<void> {
     <footer class="cal-legend">
       ${KINDS.map(
         (k) =>
-          `<span class="cal-legend-item"><span class="cal-dot cal-kind-${k.kind}"></span>${k.label}</span>`,
+          `<span class="cal-legend-item"><span class="dot dot--${k.kind}"></span>${k.label}</span>`,
       ).join('')}
     </footer>`;
 
@@ -209,8 +219,8 @@ function pillHtml(e: CalEvent): string {
   const time = timeOf(e.start);
   const label = `${escapeHtml(e.title)}, ${time}–${timeOf(e.end)}`;
   return e.activity
-    ? `<button type="button" class="cal-pill cal-kind-${e.kind}" data-event="${e.id}" title="${label}">${escapeHtml(e.title)}</button>`
-    : `<span class="cal-pill cal-kind-${e.kind}" title="${label} · logged with the focus timer">${escapeHtml(e.title)}</span>`;
+    ? `<button type="button" class="pill pill--${e.kind}" data-event="${e.id}" title="${label}">${escapeHtml(e.title)}</button>`
+    : `<span class="pill pill--${e.kind}" title="${label} · logged with the focus timer">${escapeHtml(e.title)}</span>`;
 }
 
 // ---- Week ------------------------------------------------------------------
@@ -373,7 +383,7 @@ function onClick(event: MouseEvent): void {
   }
 
   // Read-only OTJ blocks shouldn't fall through to "create".
-  if (target.closest('.cal-pill, .cal-block')) return;
+  if (target.closest('.pill, .cal-block')) return;
 
   const slot = target.closest<HTMLElement>('[data-day]');
   if (slot?.dataset.day) {
@@ -415,64 +425,43 @@ function parseDayKey(key: string): Date {
 
 // ---- "+N more" day dialog ---------------------------------------------------
 
-let dayDialog: HTMLDialogElement | null = null;
-
 function openDayDialog(day: Date, events: CalEvent[]): void {
-  if (!dayDialog) {
-    dayDialog = document.createElement('dialog');
-    dayDialog.className = 'cal-dialog';
-    document.body.append(dayDialog);
-  }
-  const el = dayDialog;
-  el.innerHTML = `
-    <div class="cal-form">
-      <div class="eyebrow">${events.length} entries</div>
-      <h2>${formatLongDay(day)}</h2>
-      <ul class="cal-day-list">
-        ${events
-          .map(
-            (e) => `
-            <li>
-              <span class="cal-dot cal-kind-${e.kind}"></span>
-              <span class="cal-day-time">${timeOf(e.start)}–${timeOf(e.end)}</span>
-              ${
-                e.activity
-                  ? `<button type="button" class="cal-link" data-event="${e.id}">${escapeHtml(e.title)}</button>`
-                  : `<span>${escapeHtml(e.title)} <small>(OTJ)</small></span>`
-              }
-            </li>`,
-          )
-          .join('')}
-      </ul>
-      <div class="cal-form-actions">
-        <button type="button" class="cal-btn" data-action="add-day">+ Add entry</button>
-        <span class="spacer"></span>
-        <button type="button" class="cal-btn cal-btn-primary" data-action="close">Close</button>
-      </div>
-    </div>`;
+  const body = document.createElement('ul');
+  body.className = 'cal-day-list';
+  body.innerHTML = events
+    .map(
+      (e) => `
+        <li>
+          <span class="dot dot--${e.kind}"></span>
+          <span class="cal-day-time">${timeOf(e.start)}–${timeOf(e.end)}</span>
+          ${
+            e.activity
+              ? `<button type="button" class="cal-link" data-event="${e.id}">${escapeHtml(e.title)}</button>`
+              : `<span>${escapeHtml(e.title)} <small>(OTJ)</small></span>`
+          }
+        </li>`,
+    )
+    .join('');
 
-  el.onclick = (event) => {
-    const target = event.target as HTMLElement;
-    if (target === el || target.closest('[data-action="close"]')) {
-      el.close();
-      return;
-    }
-    if (target.closest('[data-action="add-day"]')) {
-      el.close();
-      openEntryDialog({ mode: 'create', date: day }, () => void render());
-      return;
-    }
-    const id = target.closest<HTMLElement>('[data-event]')?.dataset.event;
+  const dialog = openDialog({
+    title: formatLongDay(day),
+    body,
+    actions: [
+      {
+        label: 'Add entry',
+        onClick: () =>
+          openEntryDialog({ mode: 'create', date: day }, () => void render()),
+      },
+      { label: 'Close', variant: 'primary' },
+    ],
+  });
+  body.addEventListener('click', (event) => {
+    const id = (event.target as HTMLElement).closest<HTMLElement>(
+      '[data-event]',
+    )?.dataset.event;
     const activity = events.find((e) => e.id === id)?.activity;
-    if (activity) {
-      el.close();
-      openEntryDialog({ mode: 'edit', activity }, () => void render());
-    }
-  };
-  el.showModal();
-}
-
-function chevron(dir: 'left' | 'right'): string {
-  const d = dir === 'left' ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6';
-  return `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`;
+    if (!activity) return;
+    dialog.close();
+    openEntryDialog({ mode: 'edit', activity }, () => void render());
+  });
 }
