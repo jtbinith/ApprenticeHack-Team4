@@ -1,0 +1,43 @@
+/* Hints under entry form fields (#51) */
+
+.hint-slot {
+  display: grid;
+  gap: 4px;
+}
+
+.hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--chartreuse-pale);
+  color: var(--green-900);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.hint-icon {
+  flex: none;
+}
+
+.hint-text {
+  flex: 1;
+}
+
+.hint-dismiss {
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.hint-dismiss:hover {
+  color: var(--text);
+}

@@ -10,7 +10,9 @@ import type {
   Review,
   Settings,
   Standard,
+  StoredFile,
 } from '../shared/types';
+import { makeDemoPdf } from './demoPdf';
 
 export function pad(n: number): string {
   return String(n).padStart(2, '0');
@@ -114,6 +116,7 @@ export interface SeedData {
   reflections: Reflection[];
   otjSessions: OtjSession[];
   reviews: Review[];
+  files: StoredFile[];
 }
 
 const LECTURES = [
@@ -229,6 +232,7 @@ export function seed(): SeedData {
   const workshop = activities.find(
     (a) => a.title === 'Workshop: time management',
   )!;
+  const assignment = activities.find((a) => a.title === 'Assignment 2 due')!;
 
   const reflection = (
     activity: Activity,
@@ -361,32 +365,167 @@ export function seed(): SeedData {
       confirmed: false,
       portalStatus: 'draft',
     }),
+    // Deadline with just the brief attached (no reflection written yet).
+    reflection(assignment, {
+      situation: 'Assignment 2: a project plan for a workplace improvement.',
+      task: 'Write and submit a 2,000-word project plan.',
+      action: '',
+      result: '',
+      ksbs: ['S2'],
+      evidence: [],
+      confirmed: true,
+      portalStatus: 'draft',
+    }),
   ];
 
-  // OTJ sessions: three a week for the last four weeks (up to today).
+  // Demo documents and links attached to entries, so the calendar shows that
+  // notes, docs and links live with each event.
+  const files: StoredFile[] = [];
+  const attachPdf = (
+    activity: Activity,
+    name: string,
+    title: string,
+    lines: string[],
+  ) => {
+    const blob = makeDemoPdf(title, lines);
+    const file: StoredFile = {
+      id: crypto.randomUUID(),
+      name,
+      type: 'application/pdf',
+      size: blob.size,
+      blob,
+      addedAt: new Date().toISOString(),
+    };
+    files.push(file);
+    reflections
+      .find((r) => r.activityId === activity.id)
+      ?.evidence.push({
+        kind: 'file',
+        fileId: file.id,
+        name,
+        type: file.type,
+        size: file.size,
+      });
+  };
+  const attachLink = (activity: Activity, url: string) =>
+    reflections
+      .find((r) => r.activityId === activity.id)
+      ?.evidence.push({ kind: 'link', url });
+
+  attachPdf(
+    lastLecture,
+    'Uni lecture notes.pdf',
+    `Uni lecture notes: ${lastLecture.title.replace('Uni lecture: ', '')}`,
+    [
+      'Key points from today:',
+      '- Main ideas covered in the lecture',
+      '- Examples from the case study',
+      '- Reading for next week',
+      'Question I asked: how this links to Assignment 2.',
+    ],
+  );
+  attachLink(lastLecture, 'https://example.invalid/uni/vle/lecture-slides');
+  attachPdf(
+    teamMeeting,
+    'Team meeting minutes.pdf',
+    'Team meeting: agenda and minutes',
+    [
+      'Agenda:',
+      '1. Project updates (my update: demo + three key points)',
+      '2. Blockers and help needed',
+      '3. Actions for next week',
+      'Action for me: share slides with the team.',
+    ],
+  );
+  attachPdf(hackathon, 'Hackathon pitch.pdf', 'Hackathon pitch: Canopy', [
+    'Problem: apprentices lose track of evidence before reviews.',
+    'Idea: one workspace for calendar, journal, OTJ hours and KSBs.',
+    'Demo: log a session, reflect, and export a review pack.',
+  ]);
+  attachLink(hackathon, 'https://github.com/jtbinith/ApprenticeHack-Team4');
+  attachPdf(
+    volunteering,
+    'Careers fair guide.pdf',
+    'Apprenticeships: a one-page guide',
+    [
+      'What an apprenticeship is: paid work + study.',
+      'How the week works: job, uni and off-the-job learning.',
+      'How to apply, and where to find vacancies.',
+    ],
+  );
+  attachPdf(
+    shadowing,
+    'Shadowing notes.pdf',
+    'Shadowing notes: customer support',
+    [
+      'Common reasons customers get in touch:',
+      '- account access',
+      '- billing questions',
+      '- how-to questions',
+      'Escalation: anything affecting many customers goes to the team lead.',
+    ],
+  );
+  attachPdf(
+    workshop,
+    'Workshop handout.pdf',
+    'Workshop handout: time management',
+    [
+      'Techniques covered:',
+      '- Prioritise with an urgent / important grid',
+      '- Block focus time in your calendar',
+      '- Review your week every Friday',
+    ],
+  );
+  attachPdf(assignment, 'Assignment 2 brief.pdf', 'Assignment 2 brief', [
+    'Write a project plan for an improvement in your workplace.',
+    'Length: 2,000 words. Include scope, timeline, risks and stakeholders.',
+    'Submit through the university portal.',
+  ]);
+
+  // OTJ sessions for the last 8 weeks (up to today):
+  // [weeks ago, day (0 = Monday), minutes, task, category, KSBs]. Some weeks
+  // hit the 6h target and some don't, so the Hours tab shows a streak and gaps.
   const today = new Date().getDay(); // 0 = Sunday
   const mondayOffset = today === 0 ? -6 : 1 - today;
-  const weeklySessions = [
-    [0, 90, 'Uni reading', 'Self-study'],
-    [2, 60, 'Mentor session', 'Mentoring'],
-    [4, 45, 'Online course module', 'Course'],
-  ] as const;
-  const otjSessions: OtjSession[] = [];
-  for (let week = -3; week <= 0; week++) {
-    for (const [day, minutes, task, category] of weeklySessions) {
-      const offset = mondayOffset + week * 7 + day;
-      if (offset > 0) continue;
-      otjSessions.push({
-        id: crypto.randomUUID(),
-        task,
-        category,
-        minutes: minutes + (week + 3) * 15,
-        endedAt: at(offset, 17).toISOString(),
-        ksbs: [],
-        portalStatus: week < -1 ? 'accepted' : 'draft',
-      });
-    }
-  }
+  const otjSessions: OtjSession[] = (
+    [
+      [0, 0, 90, 'Uni reading', 'Self-study', ['B3']],
+      [0, 1, 60, 'Mentor session', 'Mentoring', ['B2']],
+      [0, 2, 45, 'Online course module', 'Course', ['B3']],
+      [1, 0, 120, 'Uni lecture: Professional practice', 'Uni', ['B3']],
+      [1, 2, 90, 'Assignment 1 research', 'Assignment', ['K1']],
+      [1, 3, 150, 'Online course: data tools', 'Course', ['K2']],
+      [2, 1, 180, 'Uni lecture: Project management', 'Uni', ['S2']],
+      [
+        2,
+        3,
+        120,
+        'Shadowing: customer support team',
+        'Shadowing',
+        ['K1', 'B2'],
+      ],
+      [2, 4, 60, 'Weekly reflection and reading', 'Self-study', ['B1']],
+      [3, 0, 60, 'Self-study: Kanban and planning', 'Self-study', ['S2']],
+      [3, 2, 90, 'Mentor session', 'Mentoring', ['B2']],
+      [4, 1, 180, 'Uni lecture: Data and analytics', 'Uni', ['K2']],
+      [4, 2, 120, 'Spreadsheet skills practice', 'Self-study', ['K2']],
+      [4, 4, 90, 'Assignment 1 write-up', 'Assignment', ['B1']],
+      [5, 1, 120, 'Shadowing: data team', 'Shadowing', ['B2']],
+      [6, 0, 180, 'Uni lecture: Business processes', 'Uni', ['K1']],
+      [6, 3, 150, 'Workshop: problem solving', 'Course', ['S3']],
+      [7, 2, 120, 'Self-study: presentation skills', 'Self-study', ['S1']],
+    ] as const
+  )
+    .filter(([weeksAgo, day]) => mondayOffset - weeksAgo * 7 + day <= 0)
+    .map(([weeksAgo, day, minutes, task, category, ksbs]) => ({
+      id: crypto.randomUUID(),
+      task,
+      category,
+      minutes,
+      endedAt: at(mondayOffset - weeksAgo * 7 + day, 17).toISOString(),
+      ksbs: [...ksbs],
+      portalStatus: weeksAgo >= 2 ? 'accepted' : 'draft',
+    }));
 
   const reviews: Review[] = [
     {
@@ -423,6 +562,8 @@ export function seed(): SeedData {
       id: 'settings',
       apprenticeName: 'Alex',
       standardId: DEMO_STANDARD.id,
+      apprenticeshipStart: toLocalDateTime(at(-84, 9)),
+      apprenticeshipEnd: toLocalDateTime(at(540, 17)),
       weeklyOtjTargetHours: 6,
     },
     standards: [DEMO_STANDARD],
@@ -430,5 +571,6 @@ export function seed(): SeedData {
     reflections,
     otjSessions,
     reviews,
+    files,
   };
 }

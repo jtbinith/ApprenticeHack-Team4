@@ -7,7 +7,10 @@
 import './styles/index.css';
 import { db, removeOrphanFiles, seedIfEmpty } from './renderer/db';
 import { registerCalendar } from './renderer/features/calendar';
+import { registerHints } from './renderer/features/hints';
+import { registerHours } from './renderer/features/hours';
 import { registerJournal } from './renderer/features/journal';
+import { registerReviews } from './renderer/features/reviews';
 import { registerPlaceholders } from './renderer/features/placeholders';
 import { registerSetup } from './renderer/features/setup';
 import { startRouter } from './renderer/shell/router';
@@ -26,11 +29,14 @@ async function init() {
   registerPlaceholders();
   registerCalendar(); // #49
   registerJournal(); // #50
+  registerHints(); // #51
+  registerReviews(); // #57
   registerSetup(); // #55
   registerWidget('timer', (card) => {
     card.classList.add('widget-timer'); // hook for src/renderer/timer/timer.css
     mountFocusTimer(card);
   }); // #52
+  registerHours(); // #53
 
   await seedIfEmpty();
   await removeOrphanFiles();

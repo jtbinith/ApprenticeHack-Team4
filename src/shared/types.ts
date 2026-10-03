@@ -66,6 +66,8 @@ export interface Reflection {
   notes?: NotesData;
   /** KSB tags confirmed by the apprentice (vs only suggested). */
   confirmed: boolean;
+  /** Hints the apprentice marked "not relevant" (#51). */
+  dismissedHints?: string[];
   portalStatus: PortalStatus;
   assessorComment?: string;
 }
@@ -112,6 +114,8 @@ export interface OtjSession {
   minutes: number;
   ksbs: string[];
   reflectionId?: string;
+  /** Calendar activity this was logged from (OTJ suggestions, #53). */
+  activityId?: string;
   portalStatus: PortalStatus;
 }
 
@@ -130,16 +134,26 @@ export interface Review {
   kind: ReviewKind;
   formTemplateId?: string;
   formStatus: FormStatus;
+  /** Pre-review form answers, keyed by FormTemplate field key. */
+  formAnswers?: Record<string, string>;
   feedback?: string;
   targets: Target[];
   /** The calendar activity that shows this review. */
   activityId?: string;
 }
 
+/** Where a pre-review form field's auto-fill comes from (#57). */
+export type FormFieldSource =
+  | 'progress'
+  | 'ksbs'
+  | 'otj'
+  | 'targets'
+  | 'evidence';
+
 export interface FormTemplate {
   id: string;
   provider: string;
-  fields: { key: string; label: string; source?: string }[];
+  fields: { key: string; label: string; source?: FormFieldSource }[];
 }
 
 export interface Settings {
