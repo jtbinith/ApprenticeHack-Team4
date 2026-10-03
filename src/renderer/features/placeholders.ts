@@ -18,11 +18,6 @@ const VIEWS: Partial<
     title: 'KSBs',
     issue: '#56 KSBs tab: coverage, gaps, needs attention',
   },
-  reviews: {
-    eyebrow: 'Progress reviews',
-    title: 'Reviews',
-    issue: '#57 Reviews tab & pre-review form',
-  },
 };
 
 const WIDGETS: Record<WidgetSlot, { title: string; issue: string }> = {

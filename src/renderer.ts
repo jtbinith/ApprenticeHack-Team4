@@ -9,6 +9,7 @@ import { db, removeOrphanFiles, seedIfEmpty } from './renderer/db';
 import { registerCalendar } from './renderer/features/calendar';
 import { registerHints } from './renderer/features/hints';
 import { registerJournal } from './renderer/features/journal';
+import { registerReviews } from './renderer/features/reviews';
 import { registerPlaceholders } from './renderer/features/placeholders';
 import { startRouter } from './renderer/shell/router';
 import { renderTopbar, setAvatar } from './renderer/shell/topbar';
@@ -27,6 +28,7 @@ async function init() {
   registerCalendar(); // #49
   registerJournal(); // #50
   registerHints(); // #51
+  registerReviews(); // #57
   registerWidget('timer', (card) => {
     card.classList.add('widget-timer'); // hook for src/renderer/timer/timer.css
     mountFocusTimer(card);

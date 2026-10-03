@@ -45,7 +45,12 @@ export async function periodStats(period: ReviewPeriod): Promise<PeriodStats> {
     db.otjSessions.toArray(),
     db.settings.get('settings'),
   ]);
-  const entries = allEntries.filter((e) => inPeriod(e.activity.start, period));
+  // Progress only counts what has happened: an upcoming review's period ends today.
+  const sofar = {
+    from: period.from,
+    to: new Date(Math.min(period.to.getTime(), Date.now())),
+  };
+  const entries = allEntries.filter((e) => inPeriod(e.activity.start, sofar));
 
   const ksbCounts = new Map<string, number>();
   const ksbAccepted = new Map<string, number>();
@@ -65,17 +70,14 @@ export async function periodStats(period: ReviewPeriod): Promise<PeriodStats> {
 
   const otjByCategory = new Map<OtjCategory, number>();
   let otjMinutes = 0;
-  for (const s of sessions.filter((s) => inPeriod(s.endedAt, period))) {
+  for (const s of sessions.filter((s) => inPeriod(s.endedAt, sofar))) {
     otjMinutes += s.minutes;
     otjByCategory.set(
       s.category,
       (otjByCategory.get(s.category) ?? 0) + s.minutes,
     );
   }
-  const weeks = Math.max(
-    1,
-    (period.to.getTime() - period.from.getTime()) / WEEK,
-  );
+  const weeks = Math.max(1, (sofar.to.getTime() - sofar.from.getTime()) / WEEK);
 
   return {
     entries,
