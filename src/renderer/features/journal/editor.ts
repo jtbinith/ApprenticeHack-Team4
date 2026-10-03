@@ -58,7 +58,24 @@ export interface EntryEditor {
   /** Current values, including unsaved edits (notes are as of the last change). */
   getEntry(): Entry;
   isDirty(): boolean;
+  /** Call after changing getEntry() directly, so the form saves and re-renders. */
+  notifyChange(): void;
   destroy(): void;
+}
+
+/**
+ * Lets other features add behaviour to every entry form (e.g. hints, #51).
+ * The extension runs when a form is created; it may return a cleanup function.
+ */
+export type EditorExtension = (
+  editor: EntryEditor,
+  ksbs: Ksb[],
+) => void | (() => void);
+
+const extensions: EditorExtension[] = [];
+
+export function registerEditorExtension(extension: EditorExtension) {
+  extensions.push(extension);
 }
 
 export function createEntryEditor(
@@ -311,16 +328,23 @@ export function createEntryEditor(
   renderTags();
   renderSuggestions();
 
-  return {
+  const editor: EntryEditor = {
     element: root,
     getEntry: () => entry,
     isDirty: () => dirty,
+    notifyChange: changed,
     destroy() {
+      cleanups.forEach((cleanup) => cleanup());
       evidenceField.destroy();
       notesEditor?.destroy?.();
       notesEditor = undefined;
     },
   };
+  const cleanups = extensions.flatMap((extension) => {
+    const cleanup = extension(editor, ksbs);
+    return cleanup ? [cleanup] : [];
+  });
+  return editor;
 }
 
 /** `YYYY-MM-DD` for today, in local time. */

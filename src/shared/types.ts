@@ -60,6 +60,8 @@ export interface Reflection {
   notes?: NotesData;
   /** KSB tags confirmed by the apprentice (vs only suggested). */
   confirmed: boolean;
+  /** Hints the apprentice marked "not relevant" (#51). */
+  dismissedHints?: string[];
   portalStatus: PortalStatus;
   assessorComment?: string;
 }
