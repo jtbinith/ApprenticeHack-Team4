@@ -44,3 +44,7 @@ a {
 .icon {
   flex: none;
 }
+
+[hidden] {
+  display: none !important;
+}

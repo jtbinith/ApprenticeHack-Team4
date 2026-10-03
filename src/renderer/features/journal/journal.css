@@ -1,0 +1,408 @@
+/* Journal tab + entry editor (#50) */
+
+.journal {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 440px);
+  gap: 20px;
+  height: 100%;
+  min-height: 0;
+}
+
+.journal-list-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.journal-toolbar {
+  display: grid;
+  grid-template-columns:
+    minmax(140px, 1fr) minmax(0, 150px) minmax(0, 150px)
+    auto;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.journal-toolbar .input {
+  height: 36px;
+  padding: 0 10px;
+}
+
+.journal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  border-top: 1px solid var(--border);
+}
+
+.journal-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 8px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.journal-item:hover {
+  background: var(--surface-alt);
+}
+
+.journal-item.is-selected {
+  background: var(--chartreuse-pale);
+}
+
+.journal-item-main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.journal-item-title {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.journal-item-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.journal-item-ksbs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.journal-empty {
+  padding: 32px 8px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.journal-detail {
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden auto;
+  padding-left: 20px;
+  border-left: 1px solid var(--border);
+}
+
+.journal-detail-empty {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  height: 100%;
+  min-height: 240px;
+  color: var(--text-muted);
+}
+
+/* Entry editor (side panel + dialog) */
+.entry-editor {
+  display: grid;
+  gap: 14px;
+}
+
+.entry-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+
+.dialog .entry-row {
+  grid-template-columns: 1fr 1.3fr 1fr 1fr;
+}
+
+.entry-editor .field {
+  min-width: 0;
+}
+
+.star-letter {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  border-radius: 4px;
+  background: var(--green-800);
+  color: var(--text-on-dark);
+  font-size: 11px;
+}
+
+.hint-slot:empty {
+  display: none;
+}
+
+.ksb-tags,
+.ksb-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.ksb-suggestions:empty {
+  display: none;
+}
+
+/* KSB tag: code + short title + remove button */
+.ksb-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-height: 34px;
+  padding: 4px 6px 4px 12px;
+  border: 1px solid var(--chartreuse);
+  border-radius: 999px;
+  background: var(--chartreuse);
+  color: var(--green-900);
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.ksb-code {
+  font-weight: 800;
+}
+
+.ksb-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 220px;
+  font-weight: 500;
+}
+
+.ksb-remove {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.ksb-remove:hover {
+  background: rgb(53 93 11 / 0.15);
+}
+
+/* Tagged but not yet confirmed by the apprentice */
+.ksb-tag.is-unconfirmed {
+  border-style: dashed;
+  border-color: var(--green-600);
+  background: var(--chartreuse-pale);
+}
+
+/* Suggested from the text — click to add */
+.ksb-tag.is-suggestion {
+  padding-right: 12px;
+  border-style: dashed;
+  border-color: var(--green-600);
+  background: transparent;
+  font: inherit;
+  color: var(--green-900);
+  cursor: pointer;
+}
+
+.ksb-tag.is-suggestion:hover {
+  background: var(--chartreuse-pale);
+}
+
+.ksb-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Compact tags in the journal list */
+.ksb-tag.is-small {
+  min-height: 0;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.btn-small {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--green-800);
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.muted {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.evidence {
+  display: grid;
+  gap: 8px;
+  font-weight: 400;
+}
+
+.evidence-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.evidence-list:empty {
+  display: none;
+}
+
+.evidence-item {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 4px 4px 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-white);
+}
+
+.evidence-icon,
+.evidence-thumb {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background: var(--surface-alt);
+  color: var(--green-800);
+  object-fit: cover;
+}
+
+.evidence-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--green-800);
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.evidence-size {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.evidence-drop {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.evidence-drop.is-dragging {
+  border-color: var(--green-600);
+  background: var(--chartreuse-pale);
+}
+
+.evidence-add {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+}
+
+.evidence-drop-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.evidence-error {
+  margin: 0;
+  font-size: 12px;
+  color: #a33a1f;
+}
+
+.evidence-preview {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  margin: 0 auto;
+  border-radius: var(--radius-sm);
+}
+
+.notes-editor {
+  min-height: 80px;
+  padding: 6px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-white);
+  font-weight: 400;
+  color: var(--text);
+}
+
+.notes-editor .codex-editor__redactor {
+  padding-bottom: 24px !important;
+}
+
+.entry-footer {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0 4px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.entry-footer {
+  /* Cover content scrolling underneath the sticky footer. */
+  box-shadow: 0 16px 0 var(--surface);
+}
+
+.entry-status {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.entry-saved {
+  flex: 1;
+  font-size: 12px;
+  color: var(--green-600);
+  font-weight: 700;
+}
+
+/* In the dialog the body has 16px bottom padding; cover it so text doesn't show under the footer. */
+.dialog .entry-footer {
+  bottom: -16px;
+  padding-bottom: 16px;
+}

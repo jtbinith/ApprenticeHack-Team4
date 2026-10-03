@@ -1,9 +1,23 @@
-import { app, BrowserWindow, ipcMain, Notification } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  Notification,
+  session,
+  shell,
+} from 'electron';
+import { rmSync } from 'node:fs';
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import { IPC, type AppInfo } from './shared/ipc';
 import { setupFocusTimer, teardownFocusTimer } from './main/focus-timer';
+
+// CANOPY_USER_DATA=/tmp/canopy-test npm start → use a separate profile (own local data).
+if (process.env.CANOPY_USER_DATA) {
+  app.setPath('userData', process.env.CANOPY_USER_DATA);
+}
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -38,6 +52,28 @@ const createWindow = () => {
     );
   }
 
+  // Open web links (e.g. evidence links) in the user's browser, never inside the app.
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (/^https?:\/\//.test(url)) shell.openExternal(url);
+    return { action: 'deny' };
+  });
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    // Only allow reloading the app itself (e.g. dev hot reload), never other pages or dropped files.
+    try {
+      const appUrl = new URL(mainWindow?.webContents.getURL() ?? '');
+      const target = new URL(url);
+      if (
+        target.origin === appUrl.origin &&
+        target.pathname === appUrl.pathname
+      )
+        return;
+    } catch {
+      // Unparseable URL: fall through and block it.
+    }
+    event.preventDefault();
+    if (/^https?:\/\//.test(url)) shell.openExternal(url);
+  });
+
   if (process.env.CANOPY_DEVTOOLS) {
     mainWindow.webContents.openDevTools();
   }
@@ -47,11 +83,14 @@ const createWindow = () => {
   if (screenshotPath) {
     const win = mainWindow;
     win.webContents.once('did-finish-load', () => {
-      setTimeout(async () => {
-        const image = await win.webContents.capturePage();
-        await fs.writeFile(screenshotPath, image.toPNG());
-        app.quit();
-      }, 2000);
+      setTimeout(
+        async () => {
+          const image = await win.webContents.capturePage();
+          await fs.writeFile(screenshotPath, image.toPNG());
+          app.quit();
+        },
+        Number(process.env.CANOPY_SCREENSHOT_DELAY ?? 2000),
+      );
     });
   }
 };
@@ -69,7 +108,31 @@ ipcMain.handle(IPC.notify, (_event, title: string, body: string) => {
   if (Notification.isSupported()) new Notification({ title, body }).show();
 });
 
-app.whenReady().then(() => {
+// Evidence files live in IndexedDB; to open one we write a temporary copy and
+// hand it to the OS. Copies are removed when the app quits.
+const openedFilesDir = path.join(os.tmpdir(), `canopy-files-${process.pid}`);
+
+ipcMain.handle(
+  IPC.openFile,
+  async (_event, name: string, data: ArrayBuffer) => {
+    const safeName = path.basename(name).replace(/[^\w.\- ()]/g, '_') || 'file';
+    await fs.mkdir(openedFilesDir, { recursive: true });
+    const filePath = path.join(openedFilesDir, `${Date.now()}-${safeName}`);
+    await fs.writeFile(filePath, Buffer.from(data));
+    const error = await shell.openPath(filePath);
+    if (error) throw new Error(error);
+  },
+);
+
+app.on('will-quit', () => {
+  rmSync(openedFilesDir, { recursive: true, force: true });
+});
+
+app.whenReady().then(async () => {
+  // CANOPY_RESET_DATA=1 npm start → wipe local data so the demo data is re-seeded.
+  if (process.env.CANOPY_RESET_DATA) {
+    await session.defaultSession.clearStorageData({ storages: ['indexdb'] });
+  }
   createWindow();
   setupFocusTimer(() => mainWindow);
 

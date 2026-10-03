@@ -5,9 +5,11 @@
 // Import your feature below the placeholders so it replaces its placeholder.
 
 import './styles/index.css';
-import { db, seedIfEmpty } from './renderer/db';
+import { db, removeOrphanFiles, seedIfEmpty } from './renderer/db';
 import { registerCalendar } from './renderer/features/calendar';
+import { registerHints } from './renderer/features/hints';
 import { registerHours } from './renderer/features/hours';
+import { registerJournal } from './renderer/features/journal';
 import { registerPlaceholders } from './renderer/features/placeholders';
 import { startRouter } from './renderer/shell/router';
 import { renderTopbar, setAvatar } from './renderer/shell/topbar';
@@ -15,10 +17,17 @@ import { registerWidget } from './renderer/shell/widgets';
 import { byId } from './renderer/ui/dom';
 import { mountFocusTimer } from './renderer/timer/widget';
 
+// Dropping a file outside a drop zone shouldn't do anything (Electron would try to open it).
+for (const type of ['dragover', 'drop'] as const) {
+  document.addEventListener(type, (e) => e.preventDefault());
+}
+
 async function init() {
   renderTopbar(byId('topbar'));
   registerPlaceholders();
   registerCalendar(); // #49
+  registerJournal(); // #50
+  registerHints(); // #51
   registerWidget('timer', (card) => {
     card.classList.add('widget-timer'); // hook for src/renderer/timer/timer.css
     mountFocusTimer(card);
@@ -26,6 +35,7 @@ async function init() {
   registerHours(); // #53
 
   await seedIfEmpty();
+  await removeOrphanFiles();
   startRouter(byId('view'));
 
   const settings = await db.settings.get('settings');
