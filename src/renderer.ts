@@ -6,6 +6,7 @@
 
 import './styles/index.css';
 import { db, seedIfEmpty } from './renderer/db';
+import { registerHours } from './renderer/features/hours';
 import { registerPlaceholders } from './renderer/features/placeholders';
 import { startRouter } from './renderer/shell/router';
 import { renderTopbar, setAvatar } from './renderer/shell/topbar';
@@ -17,6 +18,7 @@ async function init() {
   // Feature modules go here, e.g.:
   // registerCalendar();   // #49
   // registerFocusTimer(); // #52
+  registerHours(); // #53
 
   await seedIfEmpty();
   startRouter(byId('view'));

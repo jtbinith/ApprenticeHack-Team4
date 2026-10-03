@@ -163,21 +163,38 @@ export function seed(): SeedData {
 
   const today = new Date().getDay(); // 0 = Sunday
   const mondayOffset = today === 0 ? -6 : 1 - today;
+  // [weeks ago, day (0 = Monday), minutes, task, category, KSBs]. Some weeks
+  // hit the 6h target and some don't, so the Hours tab shows a streak and gaps.
   const otjSessions: OtjSession[] = (
     [
-      [0, 90, 'Data structures reading', 'Self-study'],
-      [1, 60, 'Mentor session', 'Mentoring'],
-      [2, 45, 'Lambda course module 3', 'Course'],
+      [0, 0, 90, 'Data structures reading', 'Self-study', ['K4']],
+      [0, 1, 60, 'Mentor session', 'Mentoring', ['B4']],
+      [0, 2, 45, 'Lambda course module 3', 'Course', ['K8']],
+      [1, 0, 120, 'Uni lecture: Algorithms', 'Uni', ['K4']],
+      [1, 2, 90, 'Assignment 1 research', 'Assignment', ['K5']],
+      [1, 3, 150, 'Lambda course module 2', 'Course', ['K8']],
+      [2, 1, 180, 'Uni lecture: Testing', 'Uni', ['S5']],
+      [2, 3, 120, 'Shadowing: deployment', 'Shadowing', ['K8', 'B4']],
+      [2, 4, 60, 'Weekly reflection and reading', 'Self-study', ['B1']],
+      [3, 0, 60, 'Self-study: design patterns', 'Self-study', ['K5']],
+      [3, 2, 90, 'Mentor session', 'Mentoring', ['B4']],
+      [4, 1, 180, 'Uni lecture: Data structures', 'Uni', ['K4']],
+      [4, 2, 120, 'Unit testing kata', 'Self-study', ['S5', 'S1']],
+      [4, 4, 90, 'Assignment 1 write-up', 'Assignment', ['B1']],
+      [5, 1, 120, 'Code review shadowing', 'Shadowing', ['S11']],
+      [6, 0, 180, 'Uni lecture: Software design', 'Uni', ['K5']],
+      [6, 3, 150, 'Refactoring workshop', 'Course', ['S1']],
+      [7, 2, 120, 'Self-study: AWS basics', 'Self-study', ['K8']],
     ] as const
   )
-    .filter(([day]) => mondayOffset + day <= 0)
-    .map(([day, minutes, task, category]) => ({
+    .filter(([weeksAgo, day]) => mondayOffset - weeksAgo * 7 + day <= 0)
+    .map(([weeksAgo, day, minutes, task, category, ksbs]) => ({
       id: crypto.randomUUID(),
       task,
       category,
       minutes,
-      endedAt: at(mondayOffset + day, 17).toISOString(),
-      ksbs: [],
+      endedAt: at(mondayOffset - weeksAgo * 7 + day, 17).toISOString(),
+      ksbs: [...ksbs],
       portalStatus: 'draft',
     }));
 
@@ -216,6 +233,8 @@ export function seed(): SeedData {
       id: 'settings',
       apprenticeName: 'Alex',
       standardId: DEMO_STANDARD.id,
+      apprenticeshipStart: toLocalDateTime(at(-84, 9)),
+      apprenticeshipEnd: toLocalDateTime(at(540, 17)),
       weeklyOtjTargetHours: 6,
     },
     standards: [DEMO_STANDARD],
