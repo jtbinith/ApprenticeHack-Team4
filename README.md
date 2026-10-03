@@ -137,6 +137,17 @@ openEntryDialog();                        // "+ Add entry"
 
 Saving creates or updates the calendar activity and its STAR reflection, so the calendar and Journal tab stay in sync. Use Dexie's `liveQuery` to re-render when data changes.
 
+**Entry completeness / hints** (KSBs tab, review pack…):
+
+```ts
+import { completeness, visibleHints } from '../hints';
+
+completeness(reflection, ksbs); // { score: 0–1, passed, total: 8 }
+visibleHints(reflection, ksbs); // top 3 open hints: { id, field, message, weight }
+```
+
+To add behaviour to every entry form, use `registerEditorExtension()` from `features/journal/editor.ts` (this is how hints attach).
+
 ## UI kit
 
 Classes in `src/styles/components.css`:
