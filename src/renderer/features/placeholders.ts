@@ -8,11 +8,6 @@ import { registerWidget, type WidgetSlot } from '../shell/widgets';
 const VIEWS: Partial<
   Record<TabName, { eyebrow: string; title: string; issue: string }>
 > = {
-  calendar: {
-    eyebrow: 'Your learning calendar',
-    title: 'Calendar',
-    issue: '#49 Calendar: month and week views',
-  },
   hours: {
     eyebrow: 'Off-the-job',
     title: 'Hours',

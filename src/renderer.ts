@@ -6,11 +6,14 @@
 
 import './styles/index.css';
 import { db, removeOrphanFiles, seedIfEmpty } from './renderer/db';
+import { registerCalendar } from './renderer/features/calendar';
 import { registerJournal } from './renderer/features/journal';
 import { registerPlaceholders } from './renderer/features/placeholders';
 import { startRouter } from './renderer/shell/router';
 import { renderTopbar, setAvatar } from './renderer/shell/topbar';
+import { registerWidget } from './renderer/shell/widgets';
 import { byId } from './renderer/ui/dom';
+import { mountFocusTimer } from './renderer/timer/widget';
 
 // Dropping a file outside a drop zone shouldn't do anything (Electron would try to open it).
 for (const type of ['dragover', 'drop'] as const) {
@@ -20,10 +23,12 @@ for (const type of ['dragover', 'drop'] as const) {
 async function init() {
   renderTopbar(byId('topbar'));
   registerPlaceholders();
+  registerCalendar(); // #49
   registerJournal(); // #50
-  // Feature modules go here, e.g.:
-  // registerCalendar();   // #49
-  // registerFocusTimer(); // #52
+  registerWidget('timer', (card) => {
+    card.classList.add('widget-timer'); // hook for src/renderer/timer/timer.css
+    mountFocusTimer(card);
+  }); // #52
 
   await seedIfEmpty();
   await removeOrphanFiles();

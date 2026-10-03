@@ -30,6 +30,7 @@ export const KIND_LABELS: Record<ActivityKind, string> = {
   deadline: 'Deadline',
   learning: 'Learning',
   review: 'Review',
+  otj: 'OTJ session',
 };
 
 function emptyReflection(activity: Activity): Reflection {
@@ -82,7 +83,22 @@ export async function entryForActivity(
   return { activity, reflection };
 }
 
-/** All activities that have a reflection, newest first. */
+/** Marks a stand-in activity for a reflection that isn't on the calendar
+ *  (e.g. a focus-timer reflection — the calendar shows the OTJ session itself). */
+const REFLECTION_ONLY = 'reflection-only';
+
+function standInActivity(reflection: Reflection): Activity {
+  return {
+    id: `reflection:${reflection.id}`,
+    title: reflection.task || 'Focus session',
+    kind: 'otj',
+    start: reflection.date,
+    end: reflection.date,
+    source: REFLECTION_ONLY,
+  };
+}
+
+/** Every reflection with its calendar activity, newest first. */
 export async function listEntries(): Promise<Entry[]> {
   const reflections = await db.reflections.toArray();
   const ids = reflections
@@ -94,16 +110,24 @@ export async function listEntries(): Promise<Entry[]> {
       .map((a) => [a.id, a]),
   );
   return reflections
-    .flatMap((reflection) => {
-      const activity = reflection.activityId
-        ? activities.get(reflection.activityId)
-        : undefined;
-      return activity ? [{ activity, reflection }] : [];
-    })
+    .map((reflection) => ({
+      activity:
+        (reflection.activityId && activities.get(reflection.activityId)) ||
+        standInActivity(reflection),
+      reflection,
+    }))
     .sort((a, b) => b.activity.start.localeCompare(a.activity.start));
 }
 
 export async function saveEntry(entry: Entry): Promise<void> {
+  if (entry.activity.source === REFLECTION_ONLY) {
+    // Not on the calendar: only the reflection is stored.
+    await db.reflections.put({
+      ...entry.reflection,
+      date: entry.activity.start,
+    });
+    return;
+  }
   const reflection = {
     ...entry.reflection,
     activityId: entry.activity.id,

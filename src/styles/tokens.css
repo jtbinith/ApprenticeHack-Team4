@@ -42,6 +42,8 @@
   --kind-learning-dot: #899d4f;
   --kind-review-bg: var(--green-800);
   --kind-review-dot: var(--green-800);
+  --kind-otj-bg: var(--lime-card); /* focus timer sessions */
+  --kind-otj-dot: var(--green-600);
 
   /* Shape & type */
   --radius-lg: 20px;
