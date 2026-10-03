@@ -69,7 +69,7 @@ Apprentices must evidence progress against their standard's **KSBs** (Knowledge,
 | KSBs | Suggested via keyword match; apprentice confirms |
 | Evidence | Links / files |
 
-Notion-style block editor for free-form notes alongside.
+Notion-style block editor (Editor.js) for free-form notes alongside.
 
 ### 4.4 Context-missing hints
 Rule-based completeness checks (offline, no AI) show small notes under each field:
@@ -181,17 +181,24 @@ FormTemplate { id, provider, fields: { key, label, source? }[] }
 Period     = derived: [review[i].date, review[i+1].date)
 ```
 
-## 7. Tech stack (proposed)
+## 7. Tech stack
+Desktop app for **Linux and macOS**, built with **Electron + TypeScript** (vanilla TS, no React).
+
 | Layer | Choice |
 |---|---|
-| Frontend | Vite + React + TypeScript |
-| UI | shadcn/ui + Tailwind (Notion-like minimal look) |
-| Calendar | Schedule-X (or FullCalendar) |
-| Notes editor | BlockNote |
+| App shell | Electron (via Electron Forge `vite-typescript` template) |
+| Language | TypeScript (shared types across main / preload / renderer) |
+| Build / dev server | Vite (hot reload) |
+| UI | Plain HTML + CSS (Notion-like minimal look) |
+| Calendar | Schedule-X (vanilla JS API) |
+| Notes editor | Editor.js |
 | Storage | Dexie.js (IndexedDB) |
-| Charts | Recharts |
-| Export | react-pdf / Markdown |
+| Charts | Chart.js |
+| Export | Markdown + PDF via Electron `printToPDF` |
+| Packaging | Electron Forge makers: `.deb` / AppImage (Linux), `.dmg` (macOS via GitHub Actions) |
 | Extension (stretch) | Chrome Manifest V3 |
+
+Main process handles OS features (tray timer, notifications, global shortcut, file export); the renderer stays browser-compatible (no Node APIs) and talks to main via typed IPC through `contextBridge`.
 
 ## 8. Scope & priorities
 
