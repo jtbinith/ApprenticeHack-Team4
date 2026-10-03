@@ -3,14 +3,17 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import { IPC, type AppInfo } from './shared/ipc';
+import { setupFocusTimer, teardownFocusTimer } from './main/focus-timer';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
 
+let mainWindow: BrowserWindow | null = null;
+
 const createWindow = () => {
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1440,
     height: 900,
     minWidth: 1100,
@@ -19,7 +22,12 @@ const createWindow = () => {
     backgroundColor: '#f2f3e7',
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
+      // Keep the focus timer ticking accurately while the window is hidden.
+      backgroundThrottling: false,
     },
+  });
+  mainWindow.on('closed', () => {
+    mainWindow = null;
   });
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -37,9 +45,10 @@ const createWindow = () => {
   // CANOPY_SCREENSHOT=out.png npm start → saves a screenshot and quits (for PRs/docs).
   const screenshotPath = process.env.CANOPY_SCREENSHOT;
   if (screenshotPath) {
-    mainWindow.webContents.once('did-finish-load', () => {
+    const win = mainWindow;
+    win.webContents.once('did-finish-load', () => {
       setTimeout(async () => {
-        const image = await mainWindow.webContents.capturePage();
+        const image = await win.webContents.capturePage();
         await fs.writeFile(screenshotPath, image.toPNG());
         app.quit();
       }, 2000);
@@ -62,6 +71,7 @@ ipcMain.handle(IPC.notify, (_event, title: string, body: string) => {
 
 app.whenReady().then(() => {
   createWindow();
+  setupFocusTimer(() => mainWindow);
 
   // On macOS it's common to re-create a window when the dock icon is clicked.
   app.on('activate', () => {
@@ -70,6 +80,8 @@ app.whenReady().then(() => {
     }
   });
 });
+
+app.on('will-quit', teardownFocusTimer);
 
 // Quit when all windows are closed, except on macOS (apps stay active until Cmd + Q).
 app.on('window-all-closed', () => {

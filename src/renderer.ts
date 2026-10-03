@@ -10,14 +10,18 @@ import { registerCalendar } from './renderer/features/calendar';
 import { registerPlaceholders } from './renderer/features/placeholders';
 import { startRouter } from './renderer/shell/router';
 import { renderTopbar, setAvatar } from './renderer/shell/topbar';
+import { registerWidget } from './renderer/shell/widgets';
 import { byId } from './renderer/ui/dom';
+import { mountFocusTimer } from './renderer/timer/widget';
 
 async function init() {
   renderTopbar(byId('topbar'));
   registerPlaceholders();
   registerCalendar(); // #49
-  // Feature modules go here, e.g.:
-  // registerFocusTimer(); // #52
+  registerWidget('timer', (card) => {
+    card.classList.add('widget-timer'); // hook for src/renderer/timer/timer.css
+    mountFocusTimer(card);
+  }); // #52
 
   await seedIfEmpty();
   startRouter(byId('view'));
