@@ -1,0 +1,266 @@
+/* Setup wizard (#55) */
+
+.avatar.is-clickable {
+  cursor: pointer;
+}
+
+.avatar.is-clickable:hover,
+.avatar.is-clickable:focus-visible {
+  background: var(--brown-hover);
+  outline: 2px solid var(--green-600);
+  outline-offset: 2px;
+}
+
+.setup {
+  display: grid;
+  gap: 14px;
+}
+
+/* Stepper */
+.setup-steps {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border-radius: var(--radius);
+  background: var(--surface-alt);
+}
+
+.setup-steps li {
+  flex: 1;
+}
+
+.setup-step-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 32px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.setup-step-tab:hover {
+  color: var(--text);
+}
+
+.setup-step-tab.is-active {
+  background: var(--surface-white);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.setup-step-number {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--border-strong);
+  color: var(--text-on-dark);
+  font-size: 11px;
+}
+
+.setup-step-tab.is-active .setup-step-number,
+.setup-step-tab.is-done .setup-step-number {
+  background: var(--green-800);
+}
+
+.setup-step {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  min-height: 300px;
+}
+
+.setup-intro {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.setup-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.setup-note a {
+  color: var(--green-800);
+}
+
+.setup-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.setup-empty {
+  margin: 0;
+  padding: 16px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.setup-error {
+  margin: 0;
+  color: var(--brown);
+  font-weight: 700;
+}
+
+.setup-error:empty {
+  display: none;
+}
+
+.setup-warning {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--lime-border);
+  border-radius: var(--radius-sm);
+  background: var(--chartreuse-pale);
+  font-size: 13px;
+}
+
+/* Footer stays visible while the step scrolls */
+.setup-footer {
+  position: sticky;
+  bottom: -16px;
+  display: flex;
+  gap: 8px;
+  margin: 0 -24px -16px;
+  padding: 12px 24px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.setup-footer-spacer {
+  flex: 1;
+}
+
+/* Step 2: standard options */
+.setup-options {
+  display: grid;
+  gap: 8px;
+}
+
+.setup-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface-white);
+  cursor: pointer;
+}
+
+.setup-option:hover {
+  background: var(--surface-alt);
+}
+
+.setup-option.is-selected {
+  border-color: var(--green-800);
+  background: var(--chartreuse-pale);
+}
+
+.setup-option input {
+  accent-color: var(--green-800);
+}
+
+.setup-option-main {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+}
+
+.setup-option-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Step 3: KSB editor */
+.setup-ksb-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.setup-filters,
+.setup-ksb-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.setup-ksb-list {
+  display: grid;
+  border-top: 1px solid var(--border);
+}
+
+.setup-ksb {
+  display: grid;
+  grid-template-columns: 72px 140px minmax(0, 1fr) 36px;
+  gap: 6px 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.setup-ksb .input {
+  height: 36px;
+  padding: 0 10px;
+}
+
+.setup-ksb-code {
+  font-weight: 700;
+}
+
+.setup-ksb-keywords {
+  grid-column: 2 / 4;
+  font-size: 13px;
+}
+
+.setup-ksb-detail {
+  grid-column: 2 / 4;
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Step 4: review dates */
+.setup-reviews {
+  display: grid;
+  gap: 8px;
+}
+
+.setup-review {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 170px 140px 36px;
+  gap: 8px;
+}
+
+/* Step 5: OTJ target */
+.setup-otj .input {
+  max-width: 160px;
+}
+
+.setup-otj-total {
+  margin: 0;
+  font-weight: 700;
+  color: var(--green-900);
+}
+
+.setup-otj-total:empty {
+  display: none;
+}

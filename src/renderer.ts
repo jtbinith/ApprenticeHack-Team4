@@ -14,6 +14,7 @@ import { registerJournal } from './renderer/features/journal';
 import { registerKsbs } from './renderer/features/ksbs';
 import { registerReviews } from './renderer/features/reviews';
 import { registerPlaceholders } from './renderer/features/placeholders';
+import { registerSetup } from './renderer/features/setup';
 import { startRouter } from './renderer/shell/router';
 import { renderTopbar, setAvatar } from './renderer/shell/topbar';
 import { registerWidget } from './renderer/shell/widgets';
@@ -33,6 +34,7 @@ async function init() {
   registerHints(); // #51
   registerKsbs(); // #56
   registerReviews(); // #57
+  registerSetup(); // #55
   registerWidget('timer', (card) => {
     card.classList.add('widget-timer'); // hook for src/renderer/timer/timer.css
     mountFocusTimer(card);
