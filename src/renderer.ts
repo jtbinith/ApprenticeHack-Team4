@@ -6,6 +6,7 @@
 
 import './index.css';
 import { db, seedIfEmpty } from './renderer/db';
+import { mountCalendar } from './renderer/calendar/calendar';
 
 interface TabView {
   eyebrow: string;
@@ -48,6 +49,10 @@ function showTab(name: string) {
   document.querySelectorAll<HTMLButtonElement>('.tab').forEach((tab) => {
     tab.classList.toggle('is-active', tab.dataset.tab === name);
   });
+  if (name === 'calendar') {
+    mountCalendar(view);
+    return;
+  }
   view.innerHTML = `
     <div class="eyebrow">${v.eyebrow}</div>
     <h1 class="view-title">${v.title}</h1>
@@ -67,8 +72,8 @@ function startOfWeek(): Date {
 }
 
 async function init() {
-  showTab('calendar');
   await seedIfEmpty();
+  showTab('calendar');
 
   const settings = await db.settings.get('settings');
   const weekMinutes = (
