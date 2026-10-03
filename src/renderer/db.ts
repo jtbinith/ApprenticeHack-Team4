@@ -14,6 +14,7 @@ import type {
   Review,
   Settings,
   Standard,
+  StoredFile,
 } from '../shared/types';
 import { seed } from './seed';
 
@@ -25,6 +26,7 @@ export class CanopyDb extends Dexie {
   reviews!: EntityTable<Review, 'id'>;
   formTemplates!: EntityTable<FormTemplate, 'id'>;
   settings!: EntityTable<Settings, 'id'>;
+  files!: EntityTable<StoredFile, 'id'>;
 
   constructor() {
     super('canopy');
@@ -38,6 +40,19 @@ export class CanopyDb extends Dexie {
       formTemplates: 'id',
       settings: 'id',
     });
+    // v2: evidence files stored locally; evidence becomes links + file references.
+    this.version(2)
+      .stores({ files: 'id' })
+      .upgrade((tx) =>
+        tx
+          .table('reflections')
+          .toCollection()
+          .modify((r: { evidence: unknown[] }) => {
+            r.evidence = r.evidence.map((e) =>
+              typeof e === 'string' ? { kind: 'link', url: e } : e,
+            );
+          }),
+      );
   }
 }
 
@@ -55,6 +70,19 @@ export async function seedIfEmpty(): Promise<void> {
     await db.otjSessions.bulkPut(data.otjSessions);
     await db.reviews.bulkPut(data.reviews);
   });
+}
+
+/** Remove evidence files attached to entries that were never saved (or since edited away). */
+export async function removeOrphanFiles(): Promise<void> {
+  const used = new Set(
+    (await db.reflections.toArray()).flatMap((r) =>
+      r.evidence.flatMap((e) => (e.kind === 'file' ? [e.fileId] : [])),
+    ),
+  );
+  const orphans = (await db.files.toCollection().primaryKeys()).filter(
+    (id) => !used.has(id),
+  );
+  if (orphans.length) await db.files.bulkDelete(orphans);
 }
 
 /** Wipe all local data (backs "Delete all" in Connectors & privacy, #60). */

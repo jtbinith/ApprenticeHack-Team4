@@ -4,6 +4,7 @@
 import type {
   Activity,
   ActivityKind,
+  Ksb,
   OtjSession,
   Reflection,
   Review,
@@ -27,60 +28,84 @@ function at(dayOffset: number, hour: number, minute = 0): Date {
   return d;
 }
 
+// General enough for any apprentice; the Setup wizard (#55) will load real standards.
 const DEMO_STANDARD: Standard = {
-  id: 'demo-software-engineer-l6',
-  name: 'Software Engineer (Level 6) — demo subset',
+  id: 'demo-standard',
+  name: 'Demo standard (sample KSBs + general skills)',
   ksbs: [
-    {
-      code: 'K4',
-      type: 'K',
-      title: 'Data structures and algorithms',
-      keywords: ['algorithm', 'data structure'],
-    },
-    {
-      code: 'K5',
-      type: 'K',
-      title: 'Software design approaches and patterns',
-      keywords: ['design', 'pattern', 'architecture'],
-    },
-    {
-      code: 'K8',
-      type: 'K',
-      title: 'Cloud and deployment',
-      keywords: ['aws', 'lambda', 'cloud', 'deploy'],
-    },
-    {
-      code: 'S1',
-      type: 'S',
-      title: 'Create logical and maintainable code',
-      keywords: ['code', 'refactor'],
-    },
-    {
-      code: 'S5',
-      type: 'S',
-      title: 'Test code and analyse results',
-      keywords: ['test', 'unit test'],
-    },
-    {
-      code: 'S11',
-      type: 'S',
-      title: 'Participate in code reviews',
-      keywords: ['cr', 'code review'],
-    },
-    {
-      code: 'B1',
-      type: 'B',
-      title: 'Reflective practice',
-      keywords: ['reflect', 'journal'],
-    },
-    {
-      code: 'B4',
-      type: 'B',
-      title: 'Works collaboratively',
-      keywords: ['mentor', 'pair', 'team'],
-    },
+    k('K1', 'K', 'How the organisation works', [
+      'organisation',
+      'business',
+      'stakeholder',
+    ]),
+    k('K2', 'K', 'Tools and technologies for the role', [
+      'tool',
+      'software',
+      'technology',
+      'data',
+      'analytics',
+    ]),
+    k('S1', 'S', 'Communicate clearly with colleagues and stakeholders', [
+      'present',
+      'presentation',
+      'update',
+      'explain',
+      'stakeholder',
+    ]),
+    k('S2', 'S', 'Plan and prioritise work', [
+      'plan',
+      'planning',
+      'prioritise',
+      'deadline',
+      'kanban',
+    ]),
+    k('S3', 'S', 'Solve problems and suggest improvements', [
+      'problem',
+      'issue',
+      'fix',
+      'improve',
+      'hackathon',
+    ]),
+    k('B1', 'B', 'Reflective practice', [
+      'reflect',
+      'reflection',
+      'journal',
+      'feedback',
+    ]),
+    k('B2', 'B', 'Works collaboratively', [
+      'team',
+      'mentor',
+      'pair',
+      'shadow',
+      'colleague',
+    ]),
+    k('B3', 'B', 'Committed to continued professional development', [
+      'course',
+      'workshop',
+      'lecture',
+      'linkedin',
+      'network',
+      'cpd',
+      'newsletter',
+    ]),
+    k('G1', 'General', 'Leadership', [
+      'lead',
+      'organise',
+      'volunteer',
+      'volunteering',
+    ]),
+    k('G2', 'General', 'Resilience', ['challenge', 'setback', 'pressure']),
   ],
 };
+
+function k(
+  code: string,
+  type: Ksb['type'],
+  title: string,
+  keywords: string[],
+): Ksb {
+  return { code, type, title, keywords };
+}
 
 export interface SeedData {
   settings: Settings;
@@ -90,6 +115,18 @@ export interface SeedData {
   otjSessions: OtjSession[];
   reviews: Review[];
 }
+
+const LECTURES = [
+  'Project management',
+  'Data and analytics',
+  'Professional practice',
+  'Business processes',
+  'Digital tools',
+  'Research methods',
+  'Communication skills',
+  'Agile ways of working',
+  'Ethics and GDPR',
+];
 
 export function seed(): SeedData {
   const activities: Activity[] = [];
@@ -113,73 +150,243 @@ export function seed(): SeedData {
     return activity;
   };
 
-  add(-12, 10, 1, 'Sprint planning', 'meeting');
-  add(-10, 14, 2, 'Uni lecture: Data structures', 'learning');
-  add(-8, 16, 0.5, 'Weekly journal', 'journal');
-  const mentor = add(-6, 11, 1, '1:1 with mentor', 'meeting');
-  add(-5, 9, 3, 'AWS Lambda course', 'learning');
-  const cr = add(-3, 15, 1, 'CR review with team', 'meeting');
-  add(-1, 16, 0.5, 'Weekly journal', 'journal');
-  add(0, 10, 1, 'Pairing: firmware unit tests', 'learning');
-  add(2, 14, 2, 'Uni lecture: Software design', 'learning');
+  // Weekly rhythm, four weeks either side of today (weekdays only).
+  let lecture = 0;
+  for (let day = -28; day <= 28; day++) {
+    const weekday = at(day, 0).getDay(); // 0 = Sunday
+    const week = Math.floor((day + 28) / 7);
+    if (weekday === 1) add(day, 10, 1, 'Team planning meeting', 'meeting');
+    if (weekday === 2) {
+      add(
+        day,
+        14,
+        2,
+        `Uni lecture: ${LECTURES[lecture++ % LECTURES.length]}`,
+        'learning',
+      );
+    }
+    if (weekday === 3) add(day, 15, 1, 'Team meeting', 'meeting');
+    if (weekday === 4 && week % 2 === 0)
+      add(day, 11, 1, '1:1 with mentor', 'meeting');
+    if (weekday === 5) add(day, 16, 0.5, 'Weekly journal', 'journal');
+  }
+
+  // One-offs.
+  add(-26, 9, 3, 'Induction: apprentice welcome session', 'learning');
+  add(-20, 13, 2, 'Workshop: time management', 'learning');
+  add(-18, 12, 1, 'Assignment 1 due', 'deadline');
+  const shadowing = add(
+    -15,
+    10,
+    3,
+    'Shadowing: customer support team',
+    'learning',
+  );
+  const hackathon = add(
+    -9,
+    9,
+    7,
+    'Hackathon: improving apprentice life',
+    'learning',
+  );
+  const volunteering = add(
+    -5,
+    13,
+    3,
+    'Volunteering: STEM careers fair',
+    'learning',
+  );
+  const linkedin = add(
+    -2,
+    12,
+    1,
+    'Set up LinkedIn and grew my network',
+    'learning',
+  );
+  add(0, 10, 1, 'Shadowing a senior colleague', 'learning');
+  add(3, 13, 1.5, 'Workshop: presentation skills', 'learning');
   add(4, 12, 1, 'Assignment 2 due', 'deadline');
-  add(6, 16, 0.5, 'Weekly journal', 'journal');
-  add(11, 14, 1, 'Shadowing: on-call handover', 'learning');
-  add(15, 12, 1, 'KSB evidence submission', 'deadline');
   const review = add(9, 10, 1.5, 'Progress review (tripartite)', 'review');
+  add(11, 14, 2, 'Shadowing: data team', 'learning');
+  add(15, 12, 1, 'Portfolio evidence submission', 'deadline');
+  add(18, 15, 2, 'Volunteering: school coding club', 'learning');
+  add(22, 9, 2, 'Uni exam: Project management', 'deadline');
+  add(25, 10, 2, 'Online course: module 5', 'learning');
+
+  /** The most recent past occurrence of a recurring event, optionally renamed. */
+  const lastPast = (titlePrefix: string, rename?: string) => {
+    const now = toLocalDateTime(new Date());
+    const match = activities
+      .filter((a) => a.title.startsWith(titlePrefix) && a.start < now)
+      .sort((x, y) => y.start.localeCompare(x.start))[0];
+    if (rename) match.title = rename;
+    return match;
+  };
+  const teamMeeting = lastPast('Team meeting', 'Team meeting: project update');
+  const mentor = lastPast('1:1 with mentor');
+  const journal = lastPast('Weekly journal');
+  const lastLecture = lastPast('Uni lecture');
+  const workshop = activities.find(
+    (a) => a.title === 'Workshop: time management',
+  )!;
+
+  const reflection = (
+    activity: Activity,
+    fields: Pick<
+      Reflection,
+      | 'situation'
+      | 'task'
+      | 'action'
+      | 'result'
+      | 'ksbs'
+      | 'evidence'
+      | 'confirmed'
+      | 'portalStatus'
+    > & { assessorComment?: string },
+  ): Reflection => ({
+    id: crypto.randomUUID(),
+    activityId: activity.id,
+    date: activity.start,
+    ...fields,
+  });
 
   const reflections: Reflection[] = [
-    {
-      // Complete entry — shows what "good" looks like.
-      id: crypto.randomUUID(),
-      activityId: cr.id,
-      date: cr.start,
-      situation: 'Team code review of the motion-detection refactor.',
-      task: 'I was the author and had to respond to 12 review comments.',
+    // Complete entries — show what "good" looks like.
+    reflection(teamMeeting, {
+      situation:
+        'Weekly team meeting where everyone shares progress on their projects.',
+      task: 'I presented my project update to the team for the first time.',
       action:
-        'I split the change into two smaller CRs and added unit tests for the edge cases reviewers raised.',
+        'I prepared three key points and a short demo, and asked a colleague for feedback on my slides beforehand.',
       result:
-        'Both CRs were approved in a day. I learned to keep CRs under 300 lines so reviews are faster.',
-      ksbs: ['S11', 'S5'],
-      evidence: ['https://example.invalid/cr/123'],
+        'The team understood my blockers and two people offered to help. I learned that a short demo explains progress better than slides; next time I will time my update.',
+      ksbs: ['S1', 'B2'],
+      evidence: [
+        { kind: 'link', url: 'https://example.invalid/slides/team-update' },
+      ],
       confirmed: true,
       portalStatus: 'accepted',
-    },
-    {
-      // Deliberately thin entry — gives the hints engine (#51) something to flag.
-      id: crypto.randomUUID(),
-      activityId: mentor.id,
-      date: mentor.start,
+    }),
+    reflection(hackathon, {
+      situation:
+        'A day-long apprentice hackathon on improving apprentice life.',
+      task: 'I worked in a team of four on an app to track off-the-job hours and KSB evidence.',
+      action:
+        'I planned our tasks on a Kanban board and built the journal feature.',
+      result:
+        'We demoed a working prototype. I learned to agree how the parts fit together early so the team can build in parallel.',
+      ksbs: ['S2', 'S3', 'B2'],
+      evidence: [],
+      confirmed: true,
+      portalStatus: 'submitted',
+    }),
+    reflection(volunteering, {
+      situation: 'A STEM careers fair at a local secondary school.',
+      task: 'I volunteered to run the apprenticeship stand and answer questions from students and parents.',
+      action:
+        'I prepared a one-page guide on how apprenticeships work, and I led a short Q&A for a group of 20 students.',
+      result:
+        'Five students asked for follow-up information. I learned to explain my role without jargon; next time I will bring a short demo.',
+      ksbs: ['G1', 'S1'],
+      evidence: [],
+      confirmed: true,
+      portalStatus: 'ready',
+    }),
+    reflection(linkedin, {
+      situation:
+        'I wanted a professional presence as an apprentice and to connect with people in my industry and uni cohort.',
+      task: 'Set up my LinkedIn profile and start building my network as part of my professional development.',
+      action:
+        'I wrote a profile summary, joined 2 groups, followed 62 company pages, subscribed to 13 newsletters and connected with colleagues after events.',
+      result:
+        'I now have 555 connections. Newsletters keep me up to date with industry trends; next I will post a short reflection on my first project.',
+      ksbs: ['B3'],
+      evidence: [{ kind: 'link', url: 'https://www.linkedin.com/mynetwork/' }],
+      confirmed: true,
+      portalStatus: 'ready',
+    }),
+    reflection(shadowing, {
+      situation: 'I spent a morning shadowing the customer support team.',
+      task: 'Understand how support requests reach our team and how they are handled.',
+      action:
+        'I listened in on calls, took notes on common issues and asked the team lead how they decide what to escalate.',
+      result: 'I now understand the main reasons customers contact us.',
+      ksbs: ['K1', 'B2'],
+      evidence: [],
+      confirmed: true,
+      portalStatus: 'changes-requested',
+      assessorComment:
+        'Good start. Add what you learned about how the team prioritises requests, and how it changes your own work.',
+    }),
+    reflection(journal, {
+      situation: 'End-of-week reflection.',
+      task: 'Review what went well this week and what I want to improve.',
+      action:
+        'I looked back at my calendar and notes, and picked one thing to do differently next week.',
+      result:
+        'I realised I spend too long on emails in the morning, so next week I will block out focus time before 11am.',
+      ksbs: ['B1'],
+      evidence: [],
+      confirmed: true,
+      portalStatus: 'draft',
+    }),
+    // Partial / thin entries — give the hints engine (#51) something to flag.
+    reflection(lastLecture, {
+      situation: lastLecture.title,
+      task: 'Attend the lecture and take notes.',
+      action: 'I took notes and asked a question about the assignment.',
+      result: '',
+      ksbs: ['B3'],
+      evidence: [],
+      confirmed: false,
+      portalStatus: 'draft',
+    }),
+    reflection(workshop, {
+      situation: 'Time management workshop',
+      task: 'Learn some techniques',
+      action: 'We did some exercises',
+      result: 'It was useful',
+      ksbs: [],
+      evidence: [],
+      confirmed: false,
+      portalStatus: 'draft',
+    }),
+    reflection(mentor, {
       situation: '1:1 with mentor',
       task: 'Talked about stuff',
       action: 'We discussed things',
       result: '',
-      ksbs: ['B4'],
+      ksbs: ['B2'],
       evidence: [],
       confirmed: false,
       portalStatus: 'draft',
-    },
+    }),
   ];
 
+  // OTJ sessions: three a week for the last four weeks (up to today).
   const today = new Date().getDay(); // 0 = Sunday
   const mondayOffset = today === 0 ? -6 : 1 - today;
-  const otjSessions: OtjSession[] = (
-    [
-      [0, 90, 'Data structures reading', 'Self-study'],
-      [1, 60, 'Mentor session', 'Mentoring'],
-      [2, 45, 'Lambda course module 3', 'Course'],
-    ] as const
-  )
-    .filter(([day]) => mondayOffset + day <= 0)
-    .map(([day, minutes, task, category]) => ({
-      id: crypto.randomUUID(),
-      task,
-      category,
-      minutes,
-      endedAt: at(mondayOffset + day, 17).toISOString(),
-      ksbs: [],
-      portalStatus: 'draft',
-    }));
+  const weeklySessions = [
+    [0, 90, 'Uni reading', 'Self-study'],
+    [2, 60, 'Mentor session', 'Mentoring'],
+    [4, 45, 'Online course module', 'Course'],
+  ] as const;
+  const otjSessions: OtjSession[] = [];
+  for (let week = -3; week <= 0; week++) {
+    for (const [day, minutes, task, category] of weeklySessions) {
+      const offset = mondayOffset + week * 7 + day;
+      if (offset > 0) continue;
+      otjSessions.push({
+        id: crypto.randomUUID(),
+        task,
+        category,
+        minutes: minutes + (week + 3) * 15,
+        endedAt: at(offset, 17).toISOString(),
+        ksbs: [],
+        portalStatus: week < -1 ? 'accepted' : 'draft',
+      });
+    }
+  }
 
   const reviews: Review[] = [
     {
@@ -188,11 +395,11 @@ export function seed(): SeedData {
       kind: 'progress',
       formStatus: 'submitted',
       feedback:
-        'Good progress on code quality; needs more evidence of design work.',
+        'Good progress on communication; needs more evidence of problem solving.',
       targets: [
         {
           id: crypto.randomUUID(),
-          text: 'Evidence K5 with a design doc',
+          text: 'Evidence S3 (problem solving) with a real example',
           status: 'open',
         },
         {

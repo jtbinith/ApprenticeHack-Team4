@@ -20,11 +20,13 @@ export interface DialogOptions {
   body: HTMLElement | string;
   actions?: DialogAction[];
   onClose?: () => void;
+  /** Wider dialog for forms (720px instead of 560px). */
+  wide?: boolean;
 }
 
 export function openDialog(options: DialogOptions): { close: () => void } {
   const dialog = document.createElement('dialog');
-  dialog.className = 'dialog';
+  dialog.className = options.wide ? 'dialog dialog--wide' : 'dialog';
   dialog.innerHTML = `
     <header class="dialog-header">
       <h2 class="dialog-title"></h2>
