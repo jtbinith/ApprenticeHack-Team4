@@ -1,0 +1,5 @@
+# Docs and design exports are not formatted
+*.md
+*.html
+!index.html
+*.png

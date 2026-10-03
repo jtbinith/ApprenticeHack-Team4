@@ -1,8 +1,16 @@
-# Reflect — Apprentice Progress Companion
+# Canopy — Apprentice Workspace
 
-> **Reflect** helps UK apprentices log off-the-job (OTJ) hours with a focus timer, capture STAR reflections as they learn, track what their university has accepted, and pre-fill pre-review forms — turning review prep from an all-nighter into a 10-minute check.
+> **Canopy** helps UK apprentices log off-the-job (OTJ) hours with a focus timer, capture STAR reflections as they learn, track what their university has accepted, and pre-fill pre-review forms — turning review prep from an all-nighter into a 10-minute check.
 
 ---
+
+## Design
+Reference: [`Canopy Concept 2 screenshot.png`](Canopy%20Concept%202%20screenshot.png).
+
+- **Top bar:** Canopy logo + "Apprentice workspace", tabs **Calendar · Journal · Hours · KSBs · Reviews**, search, notifications, avatar
+- **Main area:** full-page calendar (month grid, with a week time-grid view)
+- **Right column (top → bottom):** Canopy AI chat · Focus timer · Weekly progress (hours logged)
+- **Palette:** pale apple / chartreuse greens, dark parrot green, beige and drab brown (tokens in `src/index.css`)
 
 ## 1. The problem
 
@@ -54,9 +62,10 @@ Apprentices must evidence progress against their standard's **KSBs** (Knowledge,
 - Choose provider pre-review form template (or build a custom one)
 - Optionally connect apps
 
-### 4.2 Calendar (Notion Calendar-style)
-- Week view with time grid; drag to create events
-- Click an event → side panel with STAR reflection, notes, KSB tags, evidence links
+### 4.2 Calendar
+- **Month grid** (default, per the design) and **week time-grid** view
+- Today / prev / next, "Add entry", colour-coded kinds (journal, meeting, deadline, learning, review) with legend
+- Click an event → entry dialog with STAR reflection, notes, KSB tags, evidence links
 - Review meetings highlighted on the timeline; time is grouped into **review periods** (review → next review)
 
 ### 4.3 STAR reflections
@@ -145,7 +154,11 @@ Review Pack — Period 3 (12 Jun → 12 Oct 2026)
 - Export PDF / Markdown
 - Post-review: log feedback + targets → tracked next period
 
-### 4.10 Connectors
+### 4.10 Canopy AI chat widget
+- Chat card at the top of the right column (per the design)
+- **Static mock for the demo**; a real LLM is a later opt-in with PII stripping
+
+### 4.11 Connectors
 Pluggable interface — each integration is one module:
 ```ts
 interface Connector {
@@ -200,13 +213,27 @@ Desktop app for **Linux and macOS**, built with **Electron + TypeScript** (vanil
 
 Main process handles OS features (tray timer, notifications, global shortcut, file export); the renderer stays browser-compatible (no Node APIs) and talks to main via typed IPC through `contextBridge`.
 
-## 8. Scope & priorities
+## 8. Features on the board (Team4-Kanban)
 
-| Priority | Items |
-|---|---|
-| **P0 — must demo** | Setup wizard · week calendar · STAR side panel · KSB tagging · rule-based hints · OTJ timer (start/stop → reflect) · review timeline · template review pack · PDF export · seeded mock data |
-| **P1 — strong demo** | Dashboard (coverage, gaps, OTJ projection) · review countdown nudges · pre-review form auto-fill · manual portal status + "copy for portal" · `.ics` import · plant/garden gamification · post-review targets |
-| **P2 — stretch** | AI polish & AI follow-up questions · portal CSV import · Google/Outlook OAuth · browser extension (capture + portal autofill) · idle detection |
+| Issue | Feature | Priority |
+|---|---|---|
+| #47 | Foundation: Electron + TS scaffold, data layer, seed data, CI | P0 |
+| #48 | App shell & Canopy design system | P0 |
+| #49 | Calendar: month and week views | P0 |
+| #50 | Journal: STAR entries, KSB tagging, evidence | P0 |
+| #51 | Context-missing hints & completeness score | P0 |
+| #52 | Focus timer widget & OTJ logging | P0 |
+| #53 | Hours tab & weekly progress widget | P0 |
+| #54 | Canopy AI chat widget (static mock) | P1 |
+| #55 | Setup wizard | P0 |
+| #56 | KSBs tab: coverage, gaps, needs attention | P1 |
+| #57 | Reviews tab & pre-review form | P1 |
+| #58 | Review pack & export | P0 |
+| #59 | University portal integration | P1 |
+| #60 | Connectors & privacy | P1 |
+| #61 | Demo prep | P1 |
+
+Each issue has a checklist of sub-tasks; P2 items are marked inside the checklists.
 
 ## 9. Demo script (≈3 min)
 1. **Setup** — pick standard, add review dates & OTJ target (20s)
@@ -229,7 +256,7 @@ Main process handles OS features (tray timer, notifications, global shortcut, fi
 - Suggest reflections from event titles alone, or only after the apprentice adds notes?
 
 ## 12. Suggested team split
-1. Calendar view + event side panel
-2. STAR editor, hints engine, KSB tagging
-3. Setup wizard, reviews, pre-review form, review pack/export
-4. OTJ timer + dashboard + connectors (ICS / mock first)
+1. Calendar (#49) + App shell (#48)
+2. Journal (#50) + Hints (#51)
+3. Setup wizard (#55) + Reviews (#57) + Review pack (#58)
+4. Focus timer (#52) + Hours (#53) + AI chat widget (#54)

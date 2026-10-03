@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ws:"
+    />
+    <title>Canopy</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"
+            />
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name">Canopy</div>
+          <div class="brand-sub">Apprentice workspace</div>
+        </div>
+      </div>
+      <nav class="tabs" aria-label="Main">
+        <button class="tab is-active" data-tab="calendar">Calendar</button>
+        <button class="tab" data-tab="journal">Journal</button>
+        <button class="tab" data-tab="hours">Hours</button>
+        <button class="tab" data-tab="ksbs">KSBs</button>
+        <button class="tab" data-tab="reviews">Reviews</button>
+      </nav>
+      <div class="avatar" id="avatar" aria-label="Profile">AP</div>
+    </header>
+
+    <main class="layout">
+      <section class="panel main-panel" id="view" aria-live="polite"></section>
+      <aside class="widgets">
+        <section class="panel widget widget-ai">
+          <div class="slot-title">Canopy AI</div>
+          <div class="slot-note">Chat widget · #54</div>
+        </section>
+        <section class="panel widget widget-timer">
+          <div class="slot-title">Focus timer</div>
+          <div class="slot-note">Timer &amp; OTJ logging · #52</div>
+        </section>
+        <section class="panel widget">
+          <div class="slot-title">Weekly progress</div>
+          <div class="slot-note">Hours logged · #53</div>
+          <div class="slot-stat" id="hours-stat"></div>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="statusbar" id="status"></footer>
+    <script type="module" src="/src/renderer.ts"></script>
+  </body>
+</html>
