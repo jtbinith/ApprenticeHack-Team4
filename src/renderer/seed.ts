@@ -10,7 +10,9 @@ import type {
   Review,
   Settings,
   Standard,
+  StoredFile,
 } from '../shared/types';
+import { makeDemoPdf } from './demoPdf';
 
 export function pad(n: number): string {
   return String(n).padStart(2, '0');
@@ -114,6 +116,7 @@ export interface SeedData {
   reflections: Reflection[];
   otjSessions: OtjSession[];
   reviews: Review[];
+  files: StoredFile[];
 }
 
 const LECTURES = [
@@ -229,6 +232,7 @@ export function seed(): SeedData {
   const workshop = activities.find(
     (a) => a.title === 'Workshop: time management',
   )!;
+  const assignment = activities.find((a) => a.title === 'Assignment 2 due')!;
 
   const reflection = (
     activity: Activity,
@@ -361,7 +365,122 @@ export function seed(): SeedData {
       confirmed: false,
       portalStatus: 'draft',
     }),
+    // Deadline with just the brief attached (no reflection written yet).
+    reflection(assignment, {
+      situation: 'Assignment 2: a project plan for a workplace improvement.',
+      task: 'Write and submit a 2,000-word project plan.',
+      action: '',
+      result: '',
+      ksbs: ['S2'],
+      evidence: [],
+      confirmed: true,
+      portalStatus: 'draft',
+    }),
   ];
+
+  // Demo documents and links attached to entries, so the calendar shows that
+  // notes, docs and links live with each event.
+  const files: StoredFile[] = [];
+  const attachPdf = (
+    activity: Activity,
+    name: string,
+    title: string,
+    lines: string[],
+  ) => {
+    const blob = makeDemoPdf(title, lines);
+    const file: StoredFile = {
+      id: crypto.randomUUID(),
+      name,
+      type: 'application/pdf',
+      size: blob.size,
+      blob,
+      addedAt: new Date().toISOString(),
+    };
+    files.push(file);
+    reflections
+      .find((r) => r.activityId === activity.id)
+      ?.evidence.push({
+        kind: 'file',
+        fileId: file.id,
+        name,
+        type: file.type,
+        size: file.size,
+      });
+  };
+  const attachLink = (activity: Activity, url: string) =>
+    reflections
+      .find((r) => r.activityId === activity.id)
+      ?.evidence.push({ kind: 'link', url });
+
+  attachPdf(
+    lastLecture,
+    'Uni lecture notes.pdf',
+    `Uni lecture notes: ${lastLecture.title.replace('Uni lecture: ', '')}`,
+    [
+      'Key points from today:',
+      '- Main ideas covered in the lecture',
+      '- Examples from the case study',
+      '- Reading for next week',
+      'Question I asked: how this links to Assignment 2.',
+    ],
+  );
+  attachLink(lastLecture, 'https://example.invalid/uni/vle/lecture-slides');
+  attachPdf(
+    teamMeeting,
+    'Team meeting minutes.pdf',
+    'Team meeting: agenda and minutes',
+    [
+      'Agenda:',
+      '1. Project updates (my update: demo + three key points)',
+      '2. Blockers and help needed',
+      '3. Actions for next week',
+      'Action for me: share slides with the team.',
+    ],
+  );
+  attachPdf(hackathon, 'Hackathon pitch.pdf', 'Hackathon pitch: Canopy', [
+    'Problem: apprentices lose track of evidence before reviews.',
+    'Idea: one workspace for calendar, journal, OTJ hours and KSBs.',
+    'Demo: log a session, reflect, and export a review pack.',
+  ]);
+  attachLink(hackathon, 'https://github.com/jtbinith/ApprenticeHack-Team4');
+  attachPdf(
+    volunteering,
+    'Careers fair guide.pdf',
+    'Apprenticeships: a one-page guide',
+    [
+      'What an apprenticeship is: paid work + study.',
+      'How the week works: job, uni and off-the-job learning.',
+      'How to apply, and where to find vacancies.',
+    ],
+  );
+  attachPdf(
+    shadowing,
+    'Shadowing notes.pdf',
+    'Shadowing notes: customer support',
+    [
+      'Common reasons customers get in touch:',
+      '- account access',
+      '- billing questions',
+      '- how-to questions',
+      'Escalation: anything affecting many customers goes to the team lead.',
+    ],
+  );
+  attachPdf(
+    workshop,
+    'Workshop handout.pdf',
+    'Workshop handout: time management',
+    [
+      'Techniques covered:',
+      '- Prioritise with an urgent / important grid',
+      '- Block focus time in your calendar',
+      '- Review your week every Friday',
+    ],
+  );
+  attachPdf(assignment, 'Assignment 2 brief.pdf', 'Assignment 2 brief', [
+    'Write a project plan for an improvement in your workplace.',
+    'Length: 2,000 words. Include scope, timeline, risks and stakeholders.',
+    'Submit through the university portal.',
+  ]);
 
   // OTJ sessions: three a week for the last four weeks (up to today).
   const today = new Date().getDay(); // 0 = Sunday
@@ -430,5 +549,6 @@ export function seed(): SeedData {
     reflections,
     otjSessions,
     reviews,
+    files,
   };
 }
