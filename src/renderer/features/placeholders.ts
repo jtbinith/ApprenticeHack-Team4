@@ -7,13 +7,7 @@ import { registerWidget, type WidgetSlot } from '../shell/widgets';
 
 const VIEWS: Partial<
   Record<TabName, { eyebrow: string; title: string; issue: string }>
-> = {
-  ksbs: {
-    eyebrow: 'Your framework',
-    title: 'KSBs',
-    issue: '#56 KSBs tab: coverage, gaps, needs attention',
-  },
-};
+> = {};
 
 const WIDGETS: Partial<Record<WidgetSlot, { title: string; issue: string }>> = {
   ai: { title: 'Canopy AI', issue: 'Chat widget · #54' },

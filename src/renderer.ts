@@ -11,6 +11,7 @@ import { registerCalendar } from './renderer/features/calendar';
 import { registerHints } from './renderer/features/hints';
 import { registerHours } from './renderer/features/hours';
 import { registerJournal } from './renderer/features/journal';
+import { registerKsbs } from './renderer/features/ksbs';
 import { registerReviews } from './renderer/features/reviews';
 import { registerPlaceholders } from './renderer/features/placeholders';
 import { registerSetup } from './renderer/features/setup';
@@ -31,6 +32,7 @@ async function init() {
   registerCalendar(); // #49
   registerJournal(); // #50
   registerHints(); // #51
+  registerKsbs(); // #56
   registerReviews(); // #57
   registerSetup(); // #55
   registerWidget('timer', (card) => {
