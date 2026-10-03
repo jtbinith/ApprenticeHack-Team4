@@ -482,30 +482,50 @@ export function seed(): SeedData {
     'Submit through the university portal.',
   ]);
 
-  // OTJ sessions: three a week for the last four weeks (up to today).
+  // OTJ sessions for the last 8 weeks (up to today):
+  // [weeks ago, day (0 = Monday), minutes, task, category, KSBs]. Some weeks
+  // hit the 6h target and some don't, so the Hours tab shows a streak and gaps.
   const today = new Date().getDay(); // 0 = Sunday
   const mondayOffset = today === 0 ? -6 : 1 - today;
-  const weeklySessions = [
-    [0, 90, 'Uni reading', 'Self-study'],
-    [2, 60, 'Mentor session', 'Mentoring'],
-    [4, 45, 'Online course module', 'Course'],
-  ] as const;
-  const otjSessions: OtjSession[] = [];
-  for (let week = -3; week <= 0; week++) {
-    for (const [day, minutes, task, category] of weeklySessions) {
-      const offset = mondayOffset + week * 7 + day;
-      if (offset > 0) continue;
-      otjSessions.push({
-        id: crypto.randomUUID(),
-        task,
-        category,
-        minutes: minutes + (week + 3) * 15,
-        endedAt: at(offset, 17).toISOString(),
-        ksbs: [],
-        portalStatus: week < -1 ? 'accepted' : 'draft',
-      });
-    }
-  }
+  const otjSessions: OtjSession[] = (
+    [
+      [0, 0, 90, 'Uni reading', 'Self-study', ['B3']],
+      [0, 1, 60, 'Mentor session', 'Mentoring', ['B2']],
+      [0, 2, 45, 'Online course module', 'Course', ['B3']],
+      [1, 0, 120, 'Uni lecture: Professional practice', 'Uni', ['B3']],
+      [1, 2, 90, 'Assignment 1 research', 'Assignment', ['K1']],
+      [1, 3, 150, 'Online course: data tools', 'Course', ['K2']],
+      [2, 1, 180, 'Uni lecture: Project management', 'Uni', ['S2']],
+      [
+        2,
+        3,
+        120,
+        'Shadowing: customer support team',
+        'Shadowing',
+        ['K1', 'B2'],
+      ],
+      [2, 4, 60, 'Weekly reflection and reading', 'Self-study', ['B1']],
+      [3, 0, 60, 'Self-study: Kanban and planning', 'Self-study', ['S2']],
+      [3, 2, 90, 'Mentor session', 'Mentoring', ['B2']],
+      [4, 1, 180, 'Uni lecture: Data and analytics', 'Uni', ['K2']],
+      [4, 2, 120, 'Spreadsheet skills practice', 'Self-study', ['K2']],
+      [4, 4, 90, 'Assignment 1 write-up', 'Assignment', ['B1']],
+      [5, 1, 120, 'Shadowing: data team', 'Shadowing', ['B2']],
+      [6, 0, 180, 'Uni lecture: Business processes', 'Uni', ['K1']],
+      [6, 3, 150, 'Workshop: problem solving', 'Course', ['S3']],
+      [7, 2, 120, 'Self-study: presentation skills', 'Self-study', ['S1']],
+    ] as const
+  )
+    .filter(([weeksAgo, day]) => mondayOffset - weeksAgo * 7 + day <= 0)
+    .map(([weeksAgo, day, minutes, task, category, ksbs]) => ({
+      id: crypto.randomUUID(),
+      task,
+      category,
+      minutes,
+      endedAt: at(mondayOffset - weeksAgo * 7 + day, 17).toISOString(),
+      ksbs: [...ksbs],
+      portalStatus: weeksAgo >= 2 ? 'accepted' : 'draft',
+    }));
 
   const reviews: Review[] = [
     {
@@ -542,6 +562,8 @@ export function seed(): SeedData {
       id: 'settings',
       apprenticeName: 'Alex',
       standardId: DEMO_STANDARD.id,
+      apprenticeshipStart: toLocalDateTime(at(-84, 9)),
+      apprenticeshipEnd: toLocalDateTime(at(540, 17)),
       weeklyOtjTargetHours: 6,
     },
     standards: [DEMO_STANDARD],

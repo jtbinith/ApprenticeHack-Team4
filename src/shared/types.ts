@@ -108,6 +108,8 @@ export interface OtjSession {
   minutes: number;
   ksbs: string[];
   reflectionId?: string;
+  /** Calendar activity this was logged from (OTJ suggestions, #53). */
+  activityId?: string;
   portalStatus: PortalStatus;
 }
 

@@ -8,6 +8,7 @@ import './styles/index.css';
 import { db, removeOrphanFiles, seedIfEmpty } from './renderer/db';
 import { registerCalendar } from './renderer/features/calendar';
 import { registerHints } from './renderer/features/hints';
+import { registerHours } from './renderer/features/hours';
 import { registerJournal } from './renderer/features/journal';
 import { registerPlaceholders } from './renderer/features/placeholders';
 import { startRouter } from './renderer/shell/router';
@@ -31,6 +32,7 @@ async function init() {
     card.classList.add('widget-timer'); // hook for src/renderer/timer/timer.css
     mountFocusTimer(card);
   }); // #52
+  registerHours(); // #53
 
   await seedIfEmpty();
   await removeOrphanFiles();
